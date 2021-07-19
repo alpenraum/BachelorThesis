@@ -1,0 +1,2 @@
+rootProject.name = "Bachelor Thesis"
+include ':app'
