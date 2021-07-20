@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+import com.example.bachelorthesis.persistence.databases.AppDataBase;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link SettingsFragment#newInstance} factory method to
@@ -27,10 +29,9 @@ public class SettingsFragment extends Fragment {
      *
      * @return A new instance of fragment SettingsFragment.
      */
-    // TODO: Rename and change types and number of parameters
+
     public static SettingsFragment newInstance() {
-        SettingsFragment fragment = new SettingsFragment();
-        return fragment;
+        return new SettingsFragment();
     }
 
     @Override
@@ -49,7 +50,10 @@ public class SettingsFragment extends Fragment {
 
 
         deleteButton.setOnClickListener(v1 -> {
-        }); //todo: add deleting function
+            AppDataBase db = AppDataBase.getInstance(getContext());
+            db.patientDAO().nukePatients();
+            db.patientDataDAO().nuke();
+        });
 
         return v;
     }
