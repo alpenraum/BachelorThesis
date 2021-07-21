@@ -19,5 +19,8 @@ public class Patient {
 
     public String name;
 
-
+    public Patient(long patientNumber, String name) {
+        this.patientNumber = patientNumber;
+        this.name = name;
+    }
 }

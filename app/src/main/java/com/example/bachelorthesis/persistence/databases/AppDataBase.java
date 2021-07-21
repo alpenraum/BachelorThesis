@@ -11,6 +11,10 @@ import com.example.bachelorthesis.persistence.Converters;
 import com.example.bachelorthesis.persistence.DAOs.PatientDAO;
 import com.example.bachelorthesis.persistence.DAOs.PatientDataDAO;
 import com.example.bachelorthesis.persistence.DAOs.TemplateDAO;
+import com.example.bachelorthesis.persistence.entities.Measurement;
+import com.example.bachelorthesis.persistence.entities.Patient;
+import com.example.bachelorthesis.persistence.entities.Risk;
+import com.example.bachelorthesis.persistence.entities.Treatment;
 import com.example.bachelorthesis.persistence.entities.template;
 
 import java.util.HashMap;
@@ -18,7 +22,8 @@ import java.util.HashMap;
 /**
  * @author Finn Zimmer
  */
-@Database(entities = {template.class}, version=1, exportSchema = false)
+@Database(entities = {Patient.class, Measurement.class, Risk.class, Treatment.class}, version=1,
+        exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDataBase extends RoomDatabase {
 

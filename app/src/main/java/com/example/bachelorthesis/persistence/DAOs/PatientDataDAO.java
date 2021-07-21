@@ -3,11 +3,16 @@ package com.example.bachelorthesis.persistence.DAOs;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 import com.example.bachelorthesis.persistence.entities.Measurement;
 import com.example.bachelorthesis.persistence.entities.Risk;
 import com.example.bachelorthesis.persistence.entities.Treatment;
+
+import java.util.concurrent.CompletableFuture;
+
+import io.reactivex.rxjava3.core.Completable;
 
 /**
  * @author Finn Zimmer
@@ -15,13 +20,13 @@ import com.example.bachelorthesis.persistence.entities.Treatment;
 @Dao
 public interface PatientDataDAO {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertMeasurement(Measurement measurement);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertTreatment(Treatment treatment);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertRisk(Risk risk);
 
     @Query("DELETE FROM Measurement")
