@@ -11,7 +11,7 @@ import java.util.Date;
 public class CSVPatientRecord {
 
     @CsvBindByName(column = "IDRELATION1")
-    private String patientNumber;
+    private long patientNumber;
 
     @CsvBindByName(column = "CRETIME")
     @CsvDate("yyyy-mm-dd")
@@ -26,11 +26,11 @@ public class CSVPatientRecord {
     @CsvBindByName(column = "VALUE2")
     private String value2;
 
-    public String getPatientNumber() {
+    public long getPatientNumber() {
         return patientNumber;
     }
 
-    public void setPatientNumber(String patientNumber) {
+    public void setPatientNumber(long patientNumber) {
         this.patientNumber = patientNumber;
     }
 

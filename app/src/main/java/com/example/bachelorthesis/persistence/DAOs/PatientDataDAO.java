@@ -6,13 +6,7 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
-import com.example.bachelorthesis.persistence.entities.Measurement;
-import com.example.bachelorthesis.persistence.entities.Risk;
-import com.example.bachelorthesis.persistence.entities.Treatment;
-
-import java.util.concurrent.CompletableFuture;
-
-import io.reactivex.rxjava3.core.Completable;
+import com.example.bachelorthesis.persistence.entities.PatientDataRecord;
 
 /**
  * @author Finn Zimmer
@@ -21,26 +15,12 @@ import io.reactivex.rxjava3.core.Completable;
 public interface PatientDataDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertMeasurement(Measurement measurement);
+    void insertPatientDataRecord(PatientDataRecord patientDataRecord);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertTreatment(Treatment treatment);
+    void insertPatientDataRecords(PatientDataRecord... patientDataRecords);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertRisk(Risk risk);
+    @Query("DELETE FROM patient_data_record")
+    public void nukeTable();
 
-    @Query("DELETE FROM Measurement")
-    void nukeMeasurements();
-
-    @Query("DELETE FROM Treatment")
-    void nukeTreatments();
-
-    @Query("DELETE FROM Risk")
-    void nukeRisks();
-
-    default void nuke(){
-        nukeMeasurements();
-        nukeRisks();
-        nukeTreatments();
-    }
 }

@@ -10,19 +10,15 @@ import androidx.room.TypeConverters;
 import com.example.bachelorthesis.persistence.Converters;
 import com.example.bachelorthesis.persistence.DAOs.PatientDAO;
 import com.example.bachelorthesis.persistence.DAOs.PatientDataDAO;
-import com.example.bachelorthesis.persistence.DAOs.TemplateDAO;
-import com.example.bachelorthesis.persistence.entities.Measurement;
+import com.example.bachelorthesis.persistence.entities.PatientDataRecord;
 import com.example.bachelorthesis.persistence.entities.Patient;
-import com.example.bachelorthesis.persistence.entities.Risk;
-import com.example.bachelorthesis.persistence.entities.Treatment;
-import com.example.bachelorthesis.persistence.entities.template;
 
 import java.util.HashMap;
 
 /**
  * @author Finn Zimmer
  */
-@Database(entities = {Patient.class, Measurement.class, Risk.class, Treatment.class}, version=1,
+@Database(entities = {Patient.class, PatientDataRecord.class}, version=1,
         exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDataBase extends RoomDatabase {

@@ -13,9 +13,8 @@ import java.util.List;
 public class CSVParser {
 
     public static List<CSVPatientRecord> parsePatientFile(InputStream in){
-        List<CSVPatientRecord> beans = new CsvToBeanBuilder<CSVPatientRecord>(new InputStreamReader(in))
-                .withType(CSVPatientRecord.class).build().parse();
 
-        return beans;
+        return new CsvToBeanBuilder<CSVPatientRecord>(new InputStreamReader(in))
+                .withType(CSVPatientRecord.class).build().parse();
     }
 }

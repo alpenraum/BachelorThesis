@@ -1,6 +1,7 @@
 package com.example.bachelorthesis.persistence;
 import androidx.room.TypeConverter;
-import com.example.bachelorthesis.persistence.entities.TypeMeasurement;
+
+import java.util.Date;
 
 /**
  * @author Finn Zimmer
@@ -8,21 +9,14 @@ import com.example.bachelorthesis.persistence.entities.TypeMeasurement;
 public class Converters {
 
     @TypeConverter
-    public static TypeMeasurement measurement_stringToType(String type) {
-
-        if (type.isEmpty()) {
-            return null;
-        }
-
-        return TypeMeasurement.valueOf(type);
+    public static Date fromTimestamp(Long value) {
+        return value == null ? null : new Date(value);
     }
 
     @TypeConverter
-    public static String measurement_typeToString(TypeMeasurement t) {
-        if (t == null) {
-            return null;
-        }
-
-        return t.name();
+    public static Long dateToTimestamp(Date date) {
+        return date == null ? null : date.getTime();
     }
+
+
 }

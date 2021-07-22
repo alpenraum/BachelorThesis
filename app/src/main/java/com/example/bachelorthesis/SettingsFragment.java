@@ -52,7 +52,7 @@ public class SettingsFragment extends Fragment {
         deleteButton.setOnClickListener(v1 -> {
             AppDataBase db = AppDataBase.getInstance(getContext());
             db.patientDAO().nukePatients();
-            db.patientDataDAO().nuke();
+            db.patientDataDAO().nukeTable();
         });
 
         return v;
