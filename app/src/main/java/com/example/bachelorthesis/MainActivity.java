@@ -22,12 +22,14 @@ import com.example.bachelorthesis.persistence.entities.Patient;
 import com.example.bachelorthesis.persistence.entities.PatientDataRecord;
 import com.example.bachelorthesis.utils.CSVParser;
 import com.example.bachelorthesis.utils.CSVPatientRecord;
+import com.example.bachelorthesis.utils.Concurrency;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -62,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //First launch?
+        long time = System.currentTimeMillis();
         SharedPreferences sP =
                 getSharedPreferences(getResources().getString(R.string.shared_pref_name),
                         Context.MODE_PRIVATE);
@@ -69,10 +72,25 @@ public class MainActivity extends AppCompatActivity {
         if (sP.getBoolean(INIT_LOC, true)) {
             Log.d("MainActivity", "first time launch");
 
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().hide();
+            }
+
+
+            findViewById(R.id.loading_screen_root).setVisibility(View.VISIBLE);
+
             loadData();
             SharedPreferences.Editor editor = sP.edit();
             editor.putBoolean(INIT_LOC, false);
             editor.apply();
+
+            findViewById(R.id.loading_screen_root).setVisibility(View.GONE);
+
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().show();
+            }
+
+            Log.d("TIME LOADING",""+(System.currentTimeMillis()-time)/1000.0f);
         }
 
     }
@@ -123,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
             Patient patientDoe = new Patient("08001363", "Jane Doe", new Date(1972, 6, 12));
             AtomicLong idPenz = new AtomicLong();
             AtomicLong idDoe = new AtomicLong();
-            com.mmue21.hackysnake.utils.Concurrency.executeAsync(
+               Concurrency.executeAsync(
                     () -> {
                         idPenz.set(AppDataBase.getInstance(this).patientDAO().insert(patientPenz));
                         idDoe.set(AppDataBase.getInstance(this).patientDAO().insert(patientPenz));
@@ -142,6 +160,8 @@ public class MainActivity extends AppCompatActivity {
                                                 idDoe.get()).toArray(
                                                 new PatientDataRecord[csvPatientRecords_Doe.size()]));
                     });
+
+
 
 
         } catch (IOException e) {
