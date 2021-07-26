@@ -12,7 +12,7 @@ import java.util.concurrent.Future;
 public class Concurrency {
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public static Future executeAsync(Runnable task) {
+    public static Future<?> executeAsync(Runnable task) {
        return executor.submit(task);
     }
 

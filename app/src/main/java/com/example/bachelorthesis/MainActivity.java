@@ -38,7 +38,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
-    private final static String INIT_LOC = "firstStart";
+
     private final CompositeDisposable mDisposable = new CompositeDisposable();
     private Fragment settingsFragment = null;
     private boolean settingsVisible = false;
@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("MAIN_ACTIVITY","Main Activity launched");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -63,35 +64,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        //First launch?
-        long time = System.currentTimeMillis();
-        SharedPreferences sP =
-                getSharedPreferences(getResources().getString(R.string.shared_pref_name),
-                        Context.MODE_PRIVATE);
-
-        if (sP.getBoolean(INIT_LOC, true)) {
-            Log.d("MainActivity", "first time launch");
-
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().hide();
-            }
 
 
-            findViewById(R.id.loading_screen_root).setVisibility(View.VISIBLE);
-
-            loadData();
-            SharedPreferences.Editor editor = sP.edit();
-            editor.putBoolean(INIT_LOC, false);
-            editor.apply();
-
-            findViewById(R.id.loading_screen_root).setVisibility(View.GONE);
-
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().show();
-            }
-
-            Log.d("TIME LOADING",""+(System.currentTimeMillis()-time)/1000.0f);
-        }
 
     }
 
@@ -109,6 +83,13 @@ public class MainActivity extends AppCompatActivity {
                                         "patients",
                                 throwable))
                        );
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     private void updatePatientList(List<Patient> patients) {
@@ -126,67 +107,7 @@ public class MainActivity extends AppCompatActivity {
         mDisposable.clear();
     }
 
-    private void loadData() {
 
-
-        try {
-            List<CSVPatientRecord> csvPatientRecords_Penz = CSVParser.parsePatientFile(
-                    getAssets().open("08001362_Klaus_Penz_1962-06-12.csv"));
-
-            List<CSVPatientRecord> csvPatientRecords_Doe = CSVParser.parsePatientFile(
-                    getAssets().open("08001363_Jane_Doe_1972-06-12.csv"));
-
-            //manually add the user data since it is not saved somewhere accessible;
-            Patient patientPenz = new Patient("08001362", "Klaus Penz", new Date(1962, 6, 12));
-            Patient patientDoe = new Patient("08001363", "Jane Doe", new Date(1972, 6, 12));
-            AtomicLong idPenz = new AtomicLong();
-            AtomicLong idDoe = new AtomicLong();
-               Concurrency.executeAsync(
-                    () -> {
-                        idPenz.set(AppDataBase.getInstance(this).patientDAO().insert(patientPenz));
-                        idDoe.set(AppDataBase.getInstance(this).patientDAO().insert(patientPenz));
-
-                        AppDataBase.getInstance(this)
-                                .patientDataDAO()
-                                .insertPatientDataRecords(
-                                        convertCSVPatientData(csvPatientRecords_Penz,
-                                                idPenz.get()).toArray(
-                                                new PatientDataRecord[csvPatientRecords_Penz.size()]));
-
-                        AppDataBase.getInstance(this)
-                                .patientDataDAO()
-                                .insertPatientDataRecords(
-                                        convertCSVPatientData(csvPatientRecords_Doe,
-                                                idDoe.get()).toArray(
-                                                new PatientDataRecord[csvPatientRecords_Doe.size()]));
-                    });
-
-
-
-
-        } catch (IOException e) {
-            Log.e("CSV_PARSING", "Error while parsing csv file. " + e.getMessage());
-
-            Snackbar.make(findViewById(R.id.main_activity_root), "Error while loading user data!",
-                    Snackbar.LENGTH_SHORT).show();
-
-
-        }
-
-
-    }
-
-    private List<PatientDataRecord> convertCSVPatientData(List<CSVPatientRecord> csvPatient,
-                                                          long patientId) {
-        ArrayList<PatientDataRecord> patientData = new ArrayList<>();
-
-        for (CSVPatientRecord cP : csvPatient) {
-            PatientDataRecord patientDataRecord = PatientDataRecord.generate(cP);
-            patientDataRecord.patientId = patientId;
-            patientData.add(patientDataRecord);
-        }
-        return patientData;
-    }
 
     private void showSettings() {
         View gray = findViewById(R.id.fadeBackground);
@@ -212,9 +133,7 @@ public class MainActivity extends AppCompatActivity {
         settingsFragment = null;
 
         View gray = findViewById(R.id.fadeBackground);
-        gray.animate().alpha(0.0f).withEndAction(() -> {
-            gray.setVisibility(View.GONE);
-        });
+        gray.animate().alpha(0.0f).withEndAction(() -> gray.setVisibility(View.GONE));
 
         settingsVisible = false;
     }
@@ -228,24 +147,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                if (!settingsVisible) {
-                    item.setIcon(R.drawable.settings_to_cross);
-                    AnimatedVectorDrawable avd = (AnimatedVectorDrawable) item.getIcon();
-                    avd.start();
-                    showSettings();
-                } else {
-                    item.setIcon(R.drawable.cross_to_settings);
-                    AnimatedVectorDrawable avd = (AnimatedVectorDrawable) item.getIcon();
-                    avd.start();
-                    hideSettings();
-                }
+        if (item.getItemId() == R.id.action_settings) {
+            if (!settingsVisible) {
+                item.setIcon(R.drawable.settings_to_cross);
+                AnimatedVectorDrawable avd = (AnimatedVectorDrawable) item.getIcon();
+                avd.start();
+                showSettings();
+            } else {
+                item.setIcon(R.drawable.cross_to_settings);
+                AnimatedVectorDrawable avd = (AnimatedVectorDrawable) item.getIcon();
+                avd.start();
+                hideSettings();
+            }
 
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
 
