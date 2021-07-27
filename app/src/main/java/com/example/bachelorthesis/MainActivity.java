@@ -1,8 +1,6 @@
 package com.example.bachelorthesis;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
@@ -16,32 +14,34 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bachelorthesis.persistence.databases.AppDataBase;
 import com.example.bachelorthesis.persistence.entities.Patient;
-import com.example.bachelorthesis.persistence.entities.PatientDataRecord;
-import com.example.bachelorthesis.utils.CSVParser;
-import com.example.bachelorthesis.utils.CSVPatientRecord;
-import com.example.bachelorthesis.utils.Concurrency;
-import com.google.android.material.snackbar.Snackbar;
+import com.example.bachelorthesis.PatientRecyclerView.PatientListAdapter;
+import com.example.bachelorthesis.PatientRecyclerView.PatientVisualizationCallback;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicLong;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PatientVisualizationCallback {
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
     private Fragment settingsFragment = null;
     private boolean settingsVisible = false;
+
+    private Fragment contentFragment =null;
+
+    private PatientListAdapter patientListAdapter;
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -62,6 +62,15 @@ public class MainActivity extends AppCompatActivity {
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
         }
+
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        patientListAdapter = new PatientListAdapter(new ArrayList<>(), this,layoutManager);
+
+        RecyclerView recyclerView = findViewById(R.id.main_patient_recyclerview);
+        recyclerView.setAdapter(patientListAdapter);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
 
 
 
@@ -84,6 +93,8 @@ public class MainActivity extends AppCompatActivity {
                                 throwable))
                        );
 
+        patientListAdapter.updateData(patienFlowable.blockingFirst());
+
 
     }
 
@@ -93,10 +104,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updatePatientList(List<Patient> patients) {
-        for (Patient p : patients
-        ) {
-            Log.d("PATIENT", p.name);
-        }
+        patientListAdapter.updateData(patients);
+        patientListAdapter.notifyDataSetChanged();
     }
 
 
@@ -166,4 +175,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void showPatientData(Patient patient) {
+        Log.d("Main_Activity","updating visualization");
+
+        contentFragment = ContentFragment.newInstance(patient);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager
+                .beginTransaction();
+
+        fragmentTransaction.setReorderingAllowed(true).add(R.id.main_fragment_container,
+                contentFragment).addToBackStack(null).commit();
+    }
 }

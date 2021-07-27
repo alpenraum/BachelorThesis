@@ -31,7 +31,7 @@ public interface PatientDAO {
 
     @Transaction
     @Query("Select * from patient where id = :id")
-    PatientWithData findPatientWithData(int id);
+    PatientWithData findPatientWithData(long id);
 
     @Query("Delete from patient")
     void nukePatients();

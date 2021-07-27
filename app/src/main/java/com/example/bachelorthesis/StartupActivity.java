@@ -95,6 +95,7 @@ public class StartupActivity extends AppCompatActivity {
                                                 new PatientDataRecord[csvPatientRecords_Doe.size()]));
                     });
 
+            //Ugly Anti-Pattern. I do not want to over-engineer the data loading for a proof of concept
             while (!f.isDone()) {
                 Log.d("Loading Data","Waiting on Thread Completion...");
             }
