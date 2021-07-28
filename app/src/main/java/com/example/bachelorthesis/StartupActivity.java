@@ -36,8 +36,10 @@ public class StartupActivity extends AppCompatActivity {
                         Context.MODE_PRIVATE);
 
         if (!sP.getBoolean(INIT_LOC, true)) {
+            Log.d("STARTUP","Not first launch. Skipping loading data.");
             Intent i = new Intent(this, MainActivity.class);
             startActivity(i);
+            finish();
         } else {
             SharedPreferences.Editor editor = sP.edit();
             editor.putBoolean(INIT_LOC, false);
@@ -51,8 +53,7 @@ public class StartupActivity extends AppCompatActivity {
         super.onResume();
 
 
-        Log.d("MainActivity", "first time launch");
-
+        Log.d("STARTUP", "onResume() reached. Loading data...");
         loadData();
 
         Intent i = new Intent(this, MainActivity.class);
