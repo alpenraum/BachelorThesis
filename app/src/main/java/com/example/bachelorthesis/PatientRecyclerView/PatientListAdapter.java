@@ -63,7 +63,9 @@ public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.
 
                 if(getAdapterPosition()!=-1) {
                     View oldView = layoutManager.findViewByPosition(getAdapterPosition());
-                    changeSelectedAppearance(oldView,false);
+                    if (oldView != null) {
+                        changeSelectedAppearance(oldView,false);
+                    }
                 }
                 setAdapterPosition(position);
                 changeSelectedAppearance(holder.itemView,true);
@@ -95,10 +97,15 @@ public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.
     public void clickAndScrollToPosition(int position){
         layoutManager.scrollToPosition(position);
 
-
-        changeSelectedAppearance(layoutManager.findViewByPosition(position),true);
+        View old = layoutManager.findViewByPosition(position);
+        if (old != null) {
+            changeSelectedAppearance(old,true);
+        }
         if(getAdapterPosition()!=-1) {
-            changeSelectedAppearance(layoutManager.findViewByPosition(getAdapterPosition()), false);
+            View newView = layoutManager.findViewByPosition(getAdapterPosition());
+            if (newView != null) {
+                changeSelectedAppearance(newView, false);
+            }
         }
         setAdapterPosition(position);
         visualizationCallback.showPatientData(

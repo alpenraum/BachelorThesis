@@ -6,7 +6,39 @@
     <string name="deleteData">Delete Data</string>
     <string name="close">Close</string>
     <string name="app_icon">App icon</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
+
+    <!--Data Types -->
+    <string name="treatment">Treatments</string>
+    <string name="risk">Risks</string>
+    <string name="bloodpressure">Blood Pressure</string>
+    <string name="m_hba1c">DiabetesMeasureHbA1c</string>
+    <string name="r_retinopathie">ike_risk_Retinopathie</string>
+    <string name="r_insult">ike_risk_Insult</string>
+    <string name="r_khk">ike_risk_KHK</string>
+    <string name="r_nephro">ike_risk_Nephro</string>
+    <string name="r_pavk">ike_risk_PAVK</string>
+    <string name="r_pnp">ike_risk_PNP</string>
+    <string name="t_sh">ike_therapy_SH</string>
+    <string name="t_met">ike_therapy_Met</string>
+    <string name="t_glit">ike_therapy_Glit</string>
+    <string name="t_dpp4">ike_therapy_DPP4</string>
+    <string name="t_acarb">ike_therapy_Acarb</string>
+    <string name="t_vzi">ike_therapy_VZI</string>
+    <string name="t_alt">ike_therapy_ALT</string>
+    <string name="t_misch">ike_therapy_Misch</string>
+    <string name="t_ace">ike_therapy_ACE</string>
+    <string name="t_bbl">ike_therapy_Bbl</string>
+    <string name="t_rr">ike_therapy_RR</string>
+    <string name="t_statin">ike_therapy_Statin</string>
+    <string name="t_ass">ike_therapy_ASS</string>
+    <string name="m_bmi">DiabetesMeasureBMI</string>
+    <string name="m_bodyweight">VS_bodyWeight</string>
+    <string name="m_bloodsugar">VS_bloodSugar</string>
+    <string name="m_chol">ike_Chol</string>
+    <string name="m_triglyceride">DiabetesMeasureTriglyceride</string>
+    <string name="m_creatinin">DiabetesMeasureCreatinin</string>
+    <string name="m_harn">ike_Harn</string>
+    <string name="m_bpsys">VS_bloodPressure_sys</string>
+    <string name="m_bpdia">VS_bloodPressure_dia</string>
 </resources>

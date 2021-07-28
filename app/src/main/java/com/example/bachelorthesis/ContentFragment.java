@@ -8,14 +8,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 
 import com.example.bachelorthesis.persistence.databases.AppDataBase;
 import com.example.bachelorthesis.persistence.entities.Patient;
-import com.example.bachelorthesis.persistence.entities.PatientDataRecord;
 import com.example.bachelorthesis.persistence.entities.relations.PatientWithData;
 import com.example.bachelorthesis.utils.Concurrency;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 
-import java.util.List;
 import java.util.concurrent.Future;
 
 /**
@@ -23,7 +24,7 @@ import java.util.concurrent.Future;
  * Use the {@link ContentFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ContentFragment extends Fragment {
+public class ContentFragment extends Fragment{
 
     private final OnDataLoadedCallback onDataLoadedCallback = this::updateDataset;
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -62,14 +63,53 @@ public class ContentFragment extends Fragment {
         }
 
 
+
     }
+
+
+    private void generateChips(ChipGroup cG) {
+
+        cG.addView(genChip(getResources().getString(R.string.treatment), cG));
+        cG.addView(genChip(getResources().getString(R.string.risk), cG));
+        cG.addView(genChip(getResources().getString(R.string.m_bloodsugar), cG));
+        cG.addView(genChip(getResources().getString(R.string.m_bmi), cG));
+        cG.addView(genChip(getResources().getString(R.string.m_bodyweight), cG));
+        cG.addView(genChip(getResources().getString(R.string.bloodpressure), cG));
+        cG.addView(genChip(getResources().getString(R.string.m_chol), cG));
+        cG.addView(genChip(getResources().getString(R.string.m_creatinin), cG));
+        cG.addView(genChip(getResources().getString(R.string.m_harn), cG));
+        cG.addView(genChip(getResources().getString(R.string.m_hba1c), cG));
+        cG.addView(genChip(getResources().getString(R.string.m_triglyceride), cG));
+
+    }
+
+    private Chip genChip(String name, ChipGroup cG) {
+        Chip allChip = (Chip) getLayoutInflater().inflate(R.layout.chip_filter, cG, false);
+        allChip.setText(name);
+
+        //TODO: Set custom background color per chip
+
+        allChip.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                Log.d("CONTENT_FRAGMENT", String.valueOf(compoundButton.getText()));
+            }
+        });
+
+        return allChip;
+    }
+
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_content, container, false);
+        View view =  inflater.inflate(R.layout.fragment_content, container, false);
+
+        ChipGroup chipGroup = view.findViewById(R.id.content_chipgroup);
+        generateChips(chipGroup);
+        return view;
     }
 
     @Override
@@ -92,10 +132,11 @@ public class ContentFragment extends Fragment {
         Log.d("Content-Fragment", "Working. Visualizing " + patient.name);
     }
 
-
+    //interface for loading data with callback
     private void updateDataset(PatientWithData data) {
         this.patientWithData = data;
     }
+
 
 
     private interface OnDataLoadedCallback {
