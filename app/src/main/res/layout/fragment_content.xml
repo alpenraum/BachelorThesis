@@ -6,17 +6,26 @@
     android:layout_height="match_parent"
     tools:context=".ContentFragment">
 
-    <LinearLayout
-        android:id="@+id/content_chart_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
 
-    </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/content_chart_scrollview"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="?actionBarSize"
+            android:layout_marginBottom="128dp">
+
+            <LinearLayout
+                android:id="@+id/content_chart_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+        </ScrollView>
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/content_chipgroup"

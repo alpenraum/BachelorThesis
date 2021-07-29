@@ -38,8 +38,8 @@ public class PatientDataRecord {
         this.patientId = patientId;
         this.type = type;
         this.timeStamp = timeStamp;
-        this.value1 = value1;
-        this.value2 = value2;
+        this.value1 = value1.replaceAll(",",".");
+        this.value2 = value2.replaceAll(",",".");
     }
 
     public static PatientDataRecord generate(CSVPatientRecord p){
