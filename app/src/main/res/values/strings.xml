@@ -41,4 +41,6 @@
     <string name="m_harn">ike_Harn</string>
     <string name="m_bpsys">VS_bloodPressure_sys</string>
     <string name="m_bpdia">VS_bloodPressure_dia</string>
+    <string name="second_value">second value:</string>
+    <string name="first_value">first Value:</string>
 </resources>

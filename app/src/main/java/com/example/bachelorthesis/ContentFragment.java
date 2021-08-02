@@ -1,6 +1,7 @@
 package com.example.bachelorthesis;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -14,11 +15,13 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.example.bachelorthesis.charts.LineMarkerView;
 import com.example.bachelorthesis.persistence.databases.AppDataBase;
 import com.example.bachelorthesis.persistence.entities.Patient;
 import com.example.bachelorthesis.persistence.entities.PatientDataRecord;
 import com.example.bachelorthesis.persistence.entities.relations.PatientWithData;
 import com.example.bachelorthesis.utils.Concurrency;
+import com.example.bachelorthesis.utils.DataType;
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -29,6 +32,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -141,7 +145,9 @@ public class ContentFragment extends Fragment {
         for (PatientDataRecord p : patientWithData.patientDataRecords
         ) {
             if (dataType.contains(p.type)) {
-                result.add(new Entry(p.timeStamp.getTime(), Float.parseFloat(p.value1)));
+                Entry e = new Entry(p.timeStamp.getTime(), Float.parseFloat(p.value1));
+                e.setData(p);
+                result.add(e);
             }
         }
 
@@ -153,6 +159,7 @@ public class ContentFragment extends Fragment {
 
         data.sort((entry, t1) -> { //entry < t1 == -1 / entry = t1 == 0
             if(entry.getX()<t1.getX()){
+
                 return -1;
             }else if(entry.getX() == t1.getX()){
                 return 0;
@@ -203,14 +210,24 @@ public class ContentFragment extends Fragment {
         chart.setDrawGridBackground(false);
         chart.setHighlightPerDragEnabled(true);
 
+        //dataset
         List<Entry> data = getNumericData(dataName);
         float[] minMax = getMinMaxX(data);
         LineDataSet lineDataSet = new LineDataSet(data, dataName);
-        lineDataSet.setColor(ColorTemplate.rgb("E69809"));
+        DataType d = DataType.valueOfName(dataName);
+        lineDataSet.setColor(getContext().getColor(d.getColor()));
+        lineDataSet.setHighlightEnabled(true);
+        lineDataSet.setLineWidth(3.0f);
+        lineDataSet.setDrawValues(false);
+
 
         chart.setData(new LineData(lineDataSet));
         chart.invalidate();
 
+        chart.setMarker(new LineMarkerView(getContext(),R.layout.custom_marker,getContext().getColor(d.getColor())));
+
+
+        //customize axes
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.TOP_INSIDE);
         xAxis.setDrawAxisLine(false);
@@ -229,20 +246,27 @@ public class ContentFragment extends Fragment {
 
         YAxis leftAxis = chart.getAxisLeft();
         leftAxis.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART);
-
         leftAxis.setDrawGridLines(false);
         leftAxis.setGranularityEnabled(true);
 
 
+        //disable legend
         chart.getLegend().setEnabled(false);
         chart.setNoDataText("It is pretty empty here. \n Are you sure this patient is alive and in your supervision?");
 
         YAxis rightAxis = chart.getAxisRight();
         rightAxis.setEnabled(false);
 
+        //text formatting size
+        leftAxis.setTextSize(12.0f);
+        xAxis.setTextSize(12.0f);
+        lineDataSet.setValueTextSize(16.0f);
+
+
 
         chartViewMap.put(dataName,chartLayoutView);
         chartLayout.addView(chartLayoutView);
+
     }
 
 
@@ -289,4 +313,7 @@ public class ContentFragment extends Fragment {
     private interface OnDataLoadedCallback {
         void onDataLoaded(PatientWithData data);
     }
+
+
+
 }

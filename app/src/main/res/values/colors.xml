@@ -15,5 +15,18 @@
     <color name="secondary_variant">#06686C</color>
     <color name="material_icon_grey">#737373</color>
     <color name="light_light_blue">#1A09E5ED</color>
+    <color name="data_bloodsugar">#E69809</color>
+    <color name="data_bmi">#15E677</color>
+    <color name="data_sys">#2C7DE6</color>
+    <color name="data_weight">#E637AC</color>
+    <color name="data_chol">#E97D5B</color>
+    <color name="data_creatinin">#E66615</color>
+    <color name="data_hba1c">#3220E6</color>
+    <color name="data_harn">#208513</color>
+    <color name="data_risk">#F6270E</color>
+    <color name="data_treatment">#9E20E6</color>
+    <color name="data_dia">#53F0CD</color>
+    <color name="data_triglyceride">#A4F137</color>
+    <color name="data_bloodpressure">#21DEE5</color>
 
 </resources>

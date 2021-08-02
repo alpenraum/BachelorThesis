@@ -16,7 +16,7 @@
         app:layout_constraintVertical_bias="0.0">
 
         <androidx.cardview.widget.CardView
-            android:layout_width="802dp"
+            android:layout_width="820dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="25dp"
@@ -26,6 +26,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:padding="5dp"
            >
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -57,8 +58,10 @@
 
                 <com.github.mikephil.charting.charts.LineChart
                     android:id="@+id/line_chart"
-                    android:layout_width="800dp"
+                    android:layout_width="820dp"
                     android:layout_height="300dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
 
                     android:background="@color/design_default_color_background"
                     app:layout_constraintBottom_toBottomOf="parent"
