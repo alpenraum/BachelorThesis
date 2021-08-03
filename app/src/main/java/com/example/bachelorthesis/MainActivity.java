@@ -177,6 +177,19 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
 
     @Override
     public void showPatientData(Patient patient) {
+
+        if(contentFragment!=null) {
+            if (contentFragment.isVisible()) {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager
+                        .beginTransaction();
+
+                fragmentTransaction.setReorderingAllowed(true).remove(contentFragment).commit();
+                contentFragment = null;
+            }
+        }
+
+
         Log.d("Main_Activity","updating visualization");
 
         contentFragment = ContentFragment.newInstance(patient);
