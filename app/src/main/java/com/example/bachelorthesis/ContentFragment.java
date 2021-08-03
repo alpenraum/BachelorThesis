@@ -2,12 +2,15 @@ package com.example.bachelorthesis;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -16,6 +19,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.example.bachelorthesis.charts.LineMarkerView;
+import com.example.bachelorthesis.charts.SyncChartsListener;
 import com.example.bachelorthesis.persistence.databases.AppDataBase;
 import com.example.bachelorthesis.persistence.entities.Patient;
 import com.example.bachelorthesis.persistence.entities.PatientDataRecord;
@@ -33,6 +37,8 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.ChartTouchListener;
+import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -40,6 +46,7 @@ import com.google.android.material.chip.ChipGroup;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -69,6 +76,8 @@ public class ContentFragment extends Fragment {
 
     private HashMap<String,View> chartViewMap = new HashMap<>();
     private HashMap<String,Chip> chipMap = new HashMap<>();
+
+    private List<Chart> charts = new ArrayList<>();
 
 
     public ContentFragment() {
@@ -112,7 +121,6 @@ public class ContentFragment extends Fragment {
         cG.addView(genChip(getResources().getString(R.string.bloodpressure), cG));
         cG.addView(genChip(getResources().getString(R.string.m_chol), cG));
         cG.addView(genChip(getResources().getString(R.string.m_creatinin), cG));
-        cG.addView(genChip(getResources().getString(R.string.m_harn), cG));
         cG.addView(genChip(getResources().getString(R.string.m_hba1c), cG));
         cG.addView(genChip(getResources().getString(R.string.m_triglyceride), cG));
 
@@ -181,7 +189,7 @@ public class ContentFragment extends Fragment {
         }
     }
 
-    private void showChart(String dataName) {
+    private void genLineChart(String dataName){
         View chartLayoutView = getLayoutInflater().inflate(R.layout.linechart_layout, chartLayout,
                 false);
         LineChart chart = chartLayoutView.findViewById(R.id.line_chart);
@@ -195,6 +203,7 @@ public class ContentFragment extends Fragment {
                         }
                     }
                 });
+        chart.getDescription().setText(dataName);
         chart.getDescription().setEnabled(false);
 
         // enable touch gestures
@@ -209,6 +218,7 @@ public class ContentFragment extends Fragment {
         chart.setScaleXEnabled(true);
         chart.setDrawGridBackground(false);
         chart.setHighlightPerDragEnabled(true);
+        chart.setOnChartGestureListener(new SyncChartsListener(chart,this));
 
         //dataset
         List<Entry> data = getNumericData(dataName);
@@ -225,6 +235,8 @@ public class ContentFragment extends Fragment {
         chart.invalidate();
 
         chart.setMarker(new LineMarkerView(getContext(),R.layout.custom_marker,getContext().getColor(d.getColor())));
+
+
 
 
         //customize axes
@@ -266,7 +278,36 @@ public class ContentFragment extends Fragment {
 
         chartViewMap.put(dataName,chartLayoutView);
         chartLayout.addView(chartLayoutView);
+        charts.add(chart);
+    }
 
+    private void showChart(String dataName) {
+
+        //Workaround. If this ever sees the light of a hospital many things need to be rewritten
+        String[] linecharts = new String[]{
+                "VS_bloodsugar","DiabetesMeasureBMI","VS_bodyWeight","DiabetesMeasureCreatinin","DiabetesMeasureHbA1c","DiabetesMeasureTriglyceride","ike_chol"
+        };
+
+        if(Arrays.asList(linecharts).contains(dataName)){
+                genLineChart(dataName);
+        }else if("Treatments".equals(dataName)){
+            //TODO
+        }else if("Risks".equals(dataName)){
+            //TODO
+        }else if("Blood Pressure".equals(dataName)){
+            //TODO
+        }
+
+
+
+
+
+
+    }
+
+
+    public Chart[] getOtherCharts(Chart chart){
+        return charts.stream().filter(chart1 -> !chart1.getDescription().getText().equals(chart.getDescription().getText())).toArray(Chart[]::new);
     }
 
 
@@ -310,10 +351,10 @@ public class ContentFragment extends Fragment {
     }
 
 
+
+
     private interface OnDataLoadedCallback {
         void onDataLoaded(PatientWithData data);
     }
-
-
 
 }

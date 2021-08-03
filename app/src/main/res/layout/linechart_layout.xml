@@ -59,7 +59,7 @@
                 <com.github.mikephil.charting.charts.LineChart
                     android:id="@+id/line_chart"
                     android:layout_width="820dp"
-                    android:layout_height="300dp"
+                    android:layout_height="250dp"
                     android:clipChildren="false"
                     android:clipToPadding="false"
 
