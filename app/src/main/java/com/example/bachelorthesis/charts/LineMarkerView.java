@@ -1,5 +1,6 @@
 package com.example.bachelorthesis.charts;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ import com.github.mikephil.charting.utils.MPPointF;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+@SuppressLint("ViewConstructor")
 public class LineMarkerView extends MarkerView {
 
 
@@ -42,7 +44,7 @@ public class LineMarkerView extends MarkerView {
     /**
      * Constructor. Sets up the MarkerView with a custom layout resource.
      *
-     * @param context
+     * @param context The current Context
      * @param layoutResource the layout resource to use for the MarkerView
      */
     public LineMarkerView(Context context, int layoutResource, int backgroundColor) {

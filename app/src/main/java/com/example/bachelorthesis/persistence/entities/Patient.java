@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -19,16 +18,24 @@ import java.util.Locale;
  */
 @Entity(tableName = "patient")
 public class Patient implements Parcelable {
+    public static final Creator<Patient> CREATOR = new Creator<Patient>() {
+        @Override
+        public Patient createFromParcel(Parcel in) {
+            return new Patient(in);
+        }
+
+        @Override
+        public Patient[] newArray(int size) {
+            return new Patient[size];
+        }
+    };
     @PrimaryKey(autoGenerate = true)
     public long id;
-
     /*I do not like this but inserting the specified id into the
     / auto-increment field screams problems*/
     @ColumnInfo(name = "patient_number")
     public String patientNumber;
-
     public String name;
-
     public Date birthdate;
 
     public Patient(String patientNumber, String name, Date birthdate) {
@@ -45,22 +52,11 @@ public class Patient implements Parcelable {
         try {
             birthdate = formatter.parse(in.readString());
         } catch (ParseException e) {
-            Log.e("Patient-Parcel","Birthdate of "+name+" could not be read: "+e.getMessage());
+            Log.e("Patient-Parcel",
+                    "Birthdate of " + name + " could not be read: " + e.getMessage());
             birthdate = new Date();
         }
     }
-
-    public static final Creator<Patient> CREATOR = new Creator<Patient>() {
-        @Override
-        public Patient createFromParcel(Parcel in) {
-            return new Patient(in);
-        }
-
-        @Override
-        public Patient[] newArray(int size) {
-            return new Patient[size];
-        }
-    };
 
     @Override
     public int describeContents() {

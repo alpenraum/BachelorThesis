@@ -1,6 +1,5 @@
 package com.example.bachelorthesis.persistence.entities;
 
-import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -24,7 +23,7 @@ public class PatientDataRecord {
 
     public String type;
 
-    @ColumnInfo(name ="time_stamp")
+    @ColumnInfo(name = "time_stamp")
     public Date timeStamp;
 
     public String value1;
@@ -32,19 +31,18 @@ public class PatientDataRecord {
     public String value2;
 
 
-
-    public PatientDataRecord(long patientId,String type, Date timeStamp,
+    public PatientDataRecord(long patientId, String type, Date timeStamp,
                              String value1, String value2) {
         this.patientId = patientId;
         this.type = type;
         this.timeStamp = timeStamp;
-        this.value1 = value1.replaceAll(",",".");
-        this.value2 = value2.replaceAll(",",".");
+        this.value1 = value1.replaceAll(",", ".");
+        this.value2 = value2.replaceAll(",", ".");
     }
 
-    public static PatientDataRecord generate(CSVPatientRecord p){
-        return new PatientDataRecord(-1L,p.getType(),p.getCreatedAt(),
-                p.getValue1(),p.getValue2());
+    public static PatientDataRecord generate(CSVPatientRecord p) {
+        return new PatientDataRecord(-1L, p.getType(), p.getCreatedAt(),
+                p.getValue1(), p.getValue2());
     }
 
 

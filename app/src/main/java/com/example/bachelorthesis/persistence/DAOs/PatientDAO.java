@@ -1,6 +1,5 @@
 package com.example.bachelorthesis.persistence.DAOs;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -10,12 +9,9 @@ import androidx.room.Transaction;
 import com.example.bachelorthesis.persistence.entities.Patient;
 import com.example.bachelorthesis.persistence.entities.relations.PatientWithData;
 
-
 import java.util.List;
 
-import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
-import io.reactivex.rxjava3.core.Single;
 
 /**
  * @author Finn Zimmer

@@ -25,7 +25,6 @@ import com.example.bachelorthesis.PatientRecyclerView.PatientListAdapter;
 import com.example.bachelorthesis.PatientRecyclerView.PatientVisualizationCallback;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -39,14 +38,14 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
     private Fragment settingsFragment = null;
     private boolean settingsVisible = false;
 
-    private Fragment contentFragment =null;
+    private Fragment contentFragment = null;
 
     private PatientListAdapter patientListAdapter;
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("MAIN_ACTIVITY","Main Activity launched");
+        Log.d("MAIN_ACTIVITY", "Main Activity launched");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -64,16 +63,14 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
         }
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        patientListAdapter = new PatientListAdapter(new ArrayList<>(), this,layoutManager);
+        patientListAdapter = new PatientListAdapter(new ArrayList<>(), this, layoutManager);
 
         RecyclerView recyclerView = findViewById(R.id.main_patient_recyclerview);
         recyclerView.setAdapter(patientListAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
-
-
-
+        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(),
+                DividerItemDecoration.VERTICAL));
 
 
     }
@@ -103,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
         super.onResume();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void updatePatientList(List<Patient> patients) {
         patientListAdapter.updateData(patients);
         patientListAdapter.notifyDataSetChanged();
@@ -115,7 +113,6 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
 
         mDisposable.clear();
     }
-
 
 
     private void showSettings() {
@@ -178,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
     @Override
     public void showPatientData(Patient patient) {
 
-        if(contentFragment!=null) {
+        if (contentFragment != null) {
             if (contentFragment.isVisible()) {
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager
@@ -190,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
         }
 
 
-        Log.d("Main_Activity","updating visualization");
+        Log.d("Main_Activity", "updating visualization");
 
         contentFragment = ContentFragment.newInstance(patient);
 

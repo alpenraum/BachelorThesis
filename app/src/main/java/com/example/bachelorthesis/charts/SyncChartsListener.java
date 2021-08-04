@@ -10,10 +10,10 @@ import com.github.mikephil.charting.listener.OnChartGestureListener;
 
 public class SyncChartsListener implements OnChartGestureListener {
 
-    private Chart sourceChart;
-    private ContentFragment contentFragment;
+    private final Chart<?> sourceChart;
+    private final ContentFragment contentFragment;
 
-    public SyncChartsListener(Chart sourceChart, ContentFragment contentFragment) {
+    public SyncChartsListener(Chart<?> sourceChart, ContentFragment contentFragment) {
         this.sourceChart = sourceChart;
         this.contentFragment = contentFragment;
     }
@@ -60,7 +60,7 @@ public class SyncChartsListener implements OnChartGestureListener {
         syncCharts(sourceChart, contentFragment.getOtherCharts(sourceChart));
     }
 
-    public static void syncCharts(Chart mainChart, Chart[] otherCharts) {
+    public static void syncCharts(Chart<?> mainChart, Chart<?>[] otherCharts) {
         Matrix mainMatrix;
         float[] mainVals = new float[9];
         Matrix otherMatrix;
@@ -69,7 +69,7 @@ public class SyncChartsListener implements OnChartGestureListener {
         mainMatrix.getValues(mainVals);
 
 
-        for (Chart tempChart : otherCharts) {
+        for (Chart<?> tempChart : otherCharts) {
 
             otherMatrix = tempChart.getViewPortHandler().getMatrixTouch();
             otherMatrix.getValues(otherVals);

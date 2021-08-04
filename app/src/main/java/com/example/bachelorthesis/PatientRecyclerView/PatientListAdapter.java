@@ -1,13 +1,9 @@
 package com.example.bachelorthesis.PatientRecyclerView;
 
-import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnticipateInterpolator;
-import android.view.animation.BounceInterpolator;
-import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,16 +14,17 @@ import com.example.bachelorthesis.persistence.entities.Patient;
 
 import java.util.List;
 
-public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.ViewHolder>{
+public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.ViewHolder> {
 
     private final List<Patient> localDataSet;
     private int adapterPosition = -1;
 
-    private RecyclerView.LayoutManager layoutManager;
+    private final RecyclerView.LayoutManager layoutManager;
 
-    private PatientVisualizationCallback visualizationCallback;
+    private final PatientVisualizationCallback visualizationCallback;
 
-    public PatientListAdapter(List<Patient> localDataSet, PatientVisualizationCallback callback, RecyclerView.LayoutManager layoutManager) {
+    public PatientListAdapter(List<Patient> localDataSet, PatientVisualizationCallback callback,
+                              RecyclerView.LayoutManager layoutManager) {
         this.localDataSet = localDataSet;
         this.visualizationCallback = callback;
         this.layoutManager = layoutManager;
@@ -61,14 +58,14 @@ public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.
         holder.itemView.setOnClickListener(v -> {
             if (position != getAdapterPosition()) {
 
-                if(getAdapterPosition()!=-1) {
+                if (getAdapterPosition() != -1) {
                     View oldView = layoutManager.findViewByPosition(getAdapterPosition());
                     if (oldView != null) {
-                        changeSelectedAppearance(oldView,false);
+                        changeSelectedAppearance(oldView, false);
                     }
                 }
                 setAdapterPosition(position);
-                changeSelectedAppearance(holder.itemView,true);
+                changeSelectedAppearance(holder.itemView, true);
                 visualizationCallback.showPatientData(
                         localDataSet.get(position));
             }
@@ -76,32 +73,32 @@ public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.
 
     }
 
-    private void changeSelectedAppearance(View view, boolean selected){
+    private void changeSelectedAppearance(View view, boolean selected) {
         int defaultColor = view.getContext().getColor(R.color.design_default_color_background);
         int selectedColor = view.getContext().getColor(R.color.primary_variant);
 
         ValueAnimator colorAnimation;
-        if(selected){
-            colorAnimation = ValueAnimator.ofArgb(defaultColor,selectedColor);
-        }else{
-            colorAnimation = ValueAnimator.ofArgb(selectedColor,defaultColor);
+        if (selected) {
+            colorAnimation = ValueAnimator.ofArgb(defaultColor, selectedColor);
+        } else {
+            colorAnimation = ValueAnimator.ofArgb(selectedColor, defaultColor);
         }
         colorAnimation.setDuration(250);
         colorAnimation.addUpdateListener(
-                valueAnimator -> view.setBackgroundColor((int)valueAnimator.getAnimatedValue()));
+                valueAnimator -> view.setBackgroundColor((int) valueAnimator.getAnimatedValue()));
 
         colorAnimation.start();
 
     }
 
-    public void clickAndScrollToPosition(int position){
+    public void clickAndScrollToPosition(int position) {
         layoutManager.scrollToPosition(position);
 
         View old = layoutManager.findViewByPosition(position);
         if (old != null) {
-            changeSelectedAppearance(old,true);
+            changeSelectedAppearance(old, true);
         }
-        if(getAdapterPosition()!=-1) {
+        if (getAdapterPosition() != -1) {
             View newView = layoutManager.findViewByPosition(getAdapterPosition());
             if (newView != null) {
                 changeSelectedAppearance(newView, false);
@@ -133,11 +130,6 @@ public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.
     }
 
 
-
-
-
-
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView textview_patientNumber;
         private final TextView textview_name;
@@ -150,7 +142,6 @@ public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.
             textview_name = itemView.findViewById(R.id.patientlist_textview_patientnumber);
 
 
-
         }
 
         public TextView getTextview_patientNumber() {
@@ -160,8 +151,6 @@ public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.
         public TextView getTextviewName() {
             return textview_name;
         }
-
-
 
 
     }
