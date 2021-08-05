@@ -20,12 +20,16 @@
             android:layout_marginTop="?actionBarSize"
             android:layout_marginBottom="128dp">
 
-            <LinearLayout
+            <com.jmedeisis.draglinearlayout.DragLinearLayout
                 android:id="@+id/content_chart_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"/>
         </ScrollView>
+
+
+
+
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/content_chipgroup"
@@ -39,5 +43,35 @@
 
     </com.google.android.material.chip.ChipGroup>
 
+    <com.leinardi.android.speeddial.SpeedDialOverlayLayout
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.leinardi.android.speeddial.SpeedDialView
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="116dp"
+        android:contentDescription="@string/show_different_granularities_of_the_data"
+        android:text="@string/granularity"
+        android:textColor="@android:color/white"
+        app:sdMainFabClosedSrc="@drawable/ic_baseline_show_chart_24"
+        app:sdMainFabClosedIconColor="@android:color/white"
+        app:sdMainFabOpenedIconColor="@android:color/white"
+        app:sdMainFabOpenedSrc="@drawable/ic_baseline_close_24"
+        app:sdExpansionMode="top"
+        app:sdOverlayLayout="@id/overlay"
+
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

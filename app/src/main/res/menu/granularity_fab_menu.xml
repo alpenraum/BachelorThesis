@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/last24h"
+        android:icon="@drawable/ic_baseline_24h_24"
+        android:title="@string/last_24_hours" />
+    <item
+        android:id="@+id/last_week"
+        android:icon="@drawable/ic_baseline_calendar_view_week_24"
+        android:title="@string/last_week" />
+    <item
+        android:id="@+id/last_month"
+        android:icon="@drawable/ic_baseline_calendar_view_month_24"
+        android:title="@string/last_month" />
+    <item
+        android:id="@+id/allData"
+        android:icon="@drawable/ic_baseline_wholedata_24"
+        android:title="@string/whole_dataset" />
+</menu>

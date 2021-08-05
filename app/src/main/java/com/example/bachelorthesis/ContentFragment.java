@@ -1,16 +1,14 @@
 package com.example.bachelorthesis;
 
-import android.graphics.Color;
+import android.annotation.SuppressLint;
+import android.icu.util.LocaleData;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.core.graphics.ColorUtils;
 import androidx.fragment.app.Fragment;
 
 import com.example.bachelorthesis.charts.LineMarkerView;
@@ -37,8 +35,18 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.jmedeisis.draglinearlayout.DragLinearLayout;
+import com.leinardi.android.speeddial.SpeedDialActionItem;
+import com.leinardi.android.speeddial.SpeedDialView;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalField;
+import java.time.temporal.TemporalUnit;
+import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -56,9 +64,7 @@ import java.util.concurrent.Future;
  * create an instance of this fragment.
  */
 
-    //TODO: SCROLLBAR AT BOTTOM OF SCREEN
-//TODO: SHOW LAST 24 HOURS SHORTCUT
-@SuppressWarnings("null")
+
 public class ContentFragment extends Fragment {
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -75,8 +81,10 @@ public class ContentFragment extends Fragment {
     private Patient patient;
     private PatientWithData patientWithData;
     private final OnDataLoadedCallback onDataLoadedCallback = this::updateDataset;
-    private LinearLayout chartLayout;
+    private DragLinearLayout chartLayout;
     private Long firstDataEntry = 0L;
+
+
 
 
     public ContentFragment() {
@@ -194,12 +202,12 @@ public class ContentFragment extends Fragment {
         return result;
     }
 
-    private List<Entry> getScatterChartData(String dataName, int index){
+    private List<Entry> getScatterChartData(String dataName, int index) {
         List<Entry> result = new ArrayList<>();
 
-        for (PatientDataRecord p: patientWithData.patientDataRecords){
-            if(dataName.contains(p.type)){
-                Entry e = new Entry(p.timeStamp.getTime(),index);
+        for (PatientDataRecord p : patientWithData.patientDataRecords) {
+            if (dataName.contains(p.type)) {
+                Entry e = new Entry(p.timeStamp.getTime(), index);
                 e.setData(p);
                 result.add(e);
             }
@@ -222,7 +230,8 @@ public class ContentFragment extends Fragment {
     private void hideChart(String dataName) {
         if (chartViewMap.containsKey(dataName)) {
             View chartView = chartViewMap.get(dataName);
-            chartLayout.removeView(chartView);
+            //chartLayout.removeView(chartView);
+            chartLayout.removeDragView(chartView);
             chartViewMap.remove(dataName);
         }
     }
@@ -301,13 +310,15 @@ public class ContentFragment extends Fragment {
         xAxis.setTextSize(12.0f);
 
         chartViewMap.put(dataName, chartLayoutView);
-        chartLayout.addView(chartLayoutView);
+        chartLayout.addDragView(chartLayoutView, chartLayoutView);
+        //chartLayout.addView(chartLayoutView);
 
         return chart;
     }
 
-    private ScatterChart createScatterChart(String dataName){
-        View chartLayoutView = getLayoutInflater().inflate(R.layout.scatterchart_layout, chartLayout,
+    private ScatterChart createScatterChart(String dataName) {
+        View chartLayoutView = getLayoutInflater().inflate(R.layout.scatterchart_layout,
+                chartLayout,
                 false);
         ScatterChart chart = chartLayoutView.findViewById(R.id.scatter_chart);
         ((TextView) chartLayoutView.findViewById(R.id.chart_title)).setText(dataName);
@@ -372,30 +383,33 @@ public class ContentFragment extends Fragment {
         xAxis.setTextSize(12.0f);
 
         chartViewMap.put(dataName, chartLayoutView);
-        chartLayout.addView(chartLayoutView);
+        //chartLayout.addView(chartLayoutView);
+
+        chartLayout.addDragView(chartLayoutView, chartLayoutView);
 
         return chart;
     }
 
-    private void genTreatmentScatterChart(String dataName){
+    private void genTreatmentScatterChart(String dataName) {
         ScatterChart chart = createScatterChart(dataName);
 
         //dataset
         List<IScatterDataSet> dataSets = new ArrayList<>();
         DataType d = DataType.valueOfName(dataName);
-        for(Map.Entry<String, Integer> e: scatterPlot_indexMap_Treatment.entrySet()){
+        for (Map.Entry<String, Integer> e : scatterPlot_indexMap_Treatment.entrySet()) {
 
             ScatterChart.ScatterShape scatterShape =
                     ScatterChart.ScatterShape
-                            .values()[(e.getValue()%(ScatterChart.ScatterShape.values().length-1))];
+                            .values()[(e.getValue() % (ScatterChart.ScatterShape.values().length - 1))];
 
-            List<Entry> data = getScatterChartData(e.getKey(),e.getValue());
+            List<Entry> data = getScatterChartData(e.getKey(), e.getValue());
             sortData(data);
             ScatterDataSet scatterDataSet = new ScatterDataSet(data, e.getKey());
             scatterDataSet.setScatterShape(scatterShape);
             scatterDataSet.setColor(requireContext().getColor(d.getColor()));
             scatterDataSet.setHighlightEnabled(true);
             scatterDataSet.setDrawValues(false);
+            scatterDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
 
             dataSets.add(scatterDataSet);
 
@@ -403,7 +417,7 @@ public class ContentFragment extends Fragment {
 
         chart.getAxisLeft().setValueFormatter((value, axis) ->
                 scatterPlot_indexMap_Treatment.entrySet().stream()
-                        .filter(e -> e.getValue().equals((int)value))
+                        .filter(e -> e.getValue().equals((int) value))
                         .reduce((stringIntegerEntry, stringIntegerEntry2) -> stringIntegerEntry)
                         .get().getKey());
 
@@ -421,25 +435,26 @@ public class ContentFragment extends Fragment {
         charts.add(chart);
     }
 
-    private void genRiskScatterChart(String dataName){
+    private void genRiskScatterChart(String dataName) {
         ScatterChart chart = createScatterChart(dataName);
 
         //dataset
         List<IScatterDataSet> dataSets = new ArrayList<>();
         DataType d = DataType.valueOfName(dataName);
-        for(Map.Entry<String, Integer> e: scatterPlot_indexMap_Risk.entrySet()){
+        for (Map.Entry<String, Integer> e : scatterPlot_indexMap_Risk.entrySet()) {
 
             ScatterChart.ScatterShape scatterShape =
                     ScatterChart.ScatterShape
-                            .values()[(e.getValue()%(ScatterChart.ScatterShape.values().length-1))];
+                            .values()[(e.getValue() % (ScatterChart.ScatterShape.values().length - 1))];
 
-            List<Entry> data = getScatterChartData(e.getKey(),e.getValue());
+            List<Entry> data = getScatterChartData(e.getKey(), e.getValue());
             sortData(data);
             ScatterDataSet scatterDataSet = new ScatterDataSet(data, e.getKey());
             scatterDataSet.setScatterShape(scatterShape);
             scatterDataSet.setColor(requireContext().getColor(d.getColor()));
             scatterDataSet.setHighlightEnabled(true);
             scatterDataSet.setDrawValues(false);
+            scatterDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
 
             dataSets.add(scatterDataSet);
 
@@ -447,9 +462,9 @@ public class ContentFragment extends Fragment {
 
         chart.getAxisLeft().setValueFormatter((value, axis) ->
                 scatterPlot_indexMap_Risk.entrySet().stream()
-                .filter(e -> e.getValue().equals((int)value))
-                .reduce((stringIntegerEntry, stringIntegerEntry2) -> stringIntegerEntry)
-                .get().getKey());
+                        .filter(e -> e.getValue().equals((int) value))
+                        .reduce((stringIntegerEntry, stringIntegerEntry2) -> stringIntegerEntry)
+                        .get().getKey());
 
         chart.setData(new ScatterData(dataSets));
         chart.invalidate();
@@ -463,6 +478,7 @@ public class ContentFragment extends Fragment {
         }
 
         charts.add(chart);
+
     }
 
     private void genLineChart(String dataName) {
@@ -477,6 +493,7 @@ public class ContentFragment extends Fragment {
         lineDataSet.setHighlightEnabled(true);
         lineDataSet.setLineWidth(3.0f);
         lineDataSet.setDrawValues(false);
+        lineDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
 
         chart.setData(new LineData(lineDataSet));
         chart.invalidate();
@@ -493,6 +510,7 @@ public class ContentFragment extends Fragment {
         }
 
         charts.add(chart);
+
     }
 
     private void genBloodPressureChart(String dataName) {
@@ -507,6 +525,7 @@ public class ContentFragment extends Fragment {
         lineDataSetDia.setHighlightEnabled(true);
         lineDataSetDia.setLineWidth(3.0f);
         lineDataSetDia.setDrawValues(false);
+        lineDataSetDia.setAxisDependency(YAxis.AxisDependency.LEFT);
 
         List<Entry> dataSys = getNumericData(getString(R.string.m_bpsys));
         sortData(dataSys);
@@ -516,6 +535,7 @@ public class ContentFragment extends Fragment {
         lineDataSetSys.setHighlightEnabled(true);
         lineDataSetSys.setLineWidth(3.0f);
         lineDataSetSys.setDrawValues(false);
+        lineDataSetSys.setAxisDependency(YAxis.AxisDependency.LEFT);
 
 
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
@@ -540,6 +560,7 @@ public class ContentFragment extends Fragment {
         }
 
         charts.add(chart);
+
     }
 
     private void showChart(String dataName) {
@@ -572,6 +593,7 @@ public class ContentFragment extends Fragment {
     }
 
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -582,8 +604,94 @@ public class ContentFragment extends Fragment {
 
         ChipGroup chipGroup = view.findViewById(R.id.content_chipgroup);
         generateChips(chipGroup);
+
+
+        chartLayout.setContainerScrollView(view.findViewById(R.id.content_chart_scrollview));
+
+
+
+        SpeedDialView fab = view.findViewById(R.id.fab);
+        fab.inflate(R.menu.granularity_fab_menu);
+        fab.setOnActionSelectedListener(actionItem -> {
+
+            switch (actionItem.getId()) {
+                case R.id.last24h:
+                    Log.d("FAB","24H PRESSED");
+                    showLast24H();
+                    break;
+                case R.id.last_week:
+                    showLastWeek();
+                    break;
+
+                case R.id.last_month:
+                    showLastMonth();
+                    break;
+
+                case R.id.allData:
+                    showWholeData();
+                    break;
+
+                default:
+                    return false;
+
+            }
+
+            fab.close();
+
+            return true;
+        });
+
+
         return view;
     }
+
+    private void showLast24H() {
+        LocalDate now = LocalDate.now();
+        long yesterday = now.minusDays(1).atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000;
+
+        if(!charts.isEmpty()) {
+            showWholeData();
+            LineChart chart = (LineChart) charts.get(0);
+            float scaleFactor = (System.currentTimeMillis()-firstDataEntry)/(1000.0f*60.0f*60.0f*24.0f);
+            chart.zoom(scaleFactor,1.0f,(System.currentTimeMillis()-yesterday)/2.0f,0.0f);
+            SyncChartsListener.syncCharts(chart, getOtherCharts(chart));
+        }
+    }
+
+    private void showLastWeek() {
+        LocalDate now = LocalDate.now();
+        long lastWeek = now.minusWeeks(1).atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000;
+
+        if(!charts.isEmpty()) {
+            showWholeData();
+            LineChart chart = (LineChart) charts.get(0);
+            float scaleFactor = (System.currentTimeMillis()-firstDataEntry)/(1000.0f*60.0f*60.0f*24.0f);
+            chart.zoom(scaleFactor/7.0f,1.0f,(System.currentTimeMillis()-lastWeek)/2.0f,0.0f);
+            SyncChartsListener.syncCharts(chart, getOtherCharts(chart));
+        }
+    }
+
+    private void showLastMonth() {
+        LocalDate now = LocalDate.now();
+        long lastMonth = now.minusMonths(1).atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000;
+        if(!charts.isEmpty()) {
+
+            showWholeData();
+            LineChart chart = (LineChart) charts.get(0);
+            float scaleFactor = (System.currentTimeMillis()-firstDataEntry)/(1000.0f*60.0f*60.0f*24.0f);
+            chart.zoom(scaleFactor/30.0f,1.0f,(System.currentTimeMillis()-lastMonth)/2.0f,0.0f);
+            SyncChartsListener.syncCharts(chart, getOtherCharts(chart));
+        }
+    }
+
+    private void showWholeData() {
+        if(!charts.isEmpty()) {
+            LineChart chart = (LineChart) charts.get(0);
+            chart.zoom(0.00000000001f,1.0f,0.0f,0.0f);
+            SyncChartsListener.syncCharts(chart, getOtherCharts(chart));
+        }
+    }
+
 
     @Override
     public void onResume() {

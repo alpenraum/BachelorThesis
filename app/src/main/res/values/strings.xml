@@ -43,4 +43,11 @@
     <string name="m_bpdia">VS_bloodPressure_dia</string>
     <string name="second_value">second value:</string>
     <string name="first_value">first Value:</string>
+    <string name="drag_handle">drag handle</string>
+    <string name="show_different_granularities_of_the_data">Show different granularities of the data</string>
+    <string name="granularity">granularity</string>
+    <string name="last_24_hours">Last 24 hours</string>
+    <string name="whole_dataset">Whole dataset</string>
+    <string name="last_month">Last Month</string>
+    <string name="last_week">Last Week</string>
 </resources>
