@@ -10,10 +10,14 @@
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout/linechart_layout.xml" value="1.0" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout/scatterchart_layout.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/menu/granularity_fab_menu.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/finn/AndroidStudioProjects/BachelorThesis/app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="..\:/Users/finn/AndroidStudioProjects/BachelorThesis/app/src/main/res/layout/chip_filter.xml" value="0.209765625" />
+        <entry key="..\:/Users/finn/AndroidStudioProjects/BachelorThesis/app/src/main/res/layout/fragment_content.xml" value="0.209765625" />
+        <entry key="..\:/Users/finn/AndroidStudioProjects/BachelorThesis/app/src/main/res/layout/patient_recyclerview_listitem.xml" value="0.209765625" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

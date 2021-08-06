@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.bachelorthesis.R;
 import com.example.bachelorthesis.persistence.entities.Patient;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.ViewHolder> {
@@ -45,6 +46,10 @@ public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.
 
         return new ViewHolder(view);
 
+    }
+
+    public List<Patient> getLocalDataSet() {
+        return new ArrayList<>(localDataSet);
     }
 
     @Override
