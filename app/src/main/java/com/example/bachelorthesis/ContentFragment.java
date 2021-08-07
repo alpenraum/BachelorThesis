@@ -1,6 +1,7 @@
 package com.example.bachelorthesis;
 
 import android.annotation.SuppressLint;
+import android.content.res.ColorStateList;
 import android.icu.util.LocaleData;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.core.graphics.ColorUtils;
 import androidx.fragment.app.Fragment;
 
 import com.example.bachelorthesis.charts.LineMarkerView;
@@ -170,7 +172,19 @@ public class ContentFragment extends Fragment {
         Chip allChip = (Chip) getLayoutInflater().inflate(R.layout.chip_filter, cG, false);
         allChip.setText(name);
 
-        //TODO: Set custom background color per chip
+
+
+        int states[][] = new int[][]{
+                new int[]{android.R.attr.state_checked},
+                new int[]{-android.R.attr.state_checked}
+        };
+        int color = getContext().getColor(DataType.valueOfName(name).getColor());
+        int colors[] = new int[]{
+                color,
+                ColorUtils.setAlphaComponent(color,255/4)
+        };
+
+        allChip.setChipBackgroundColor(new ColorStateList(states,colors));
 
         allChip.setOnCheckedChangeListener((compoundButton, b) -> {
             Log.d("CONTENT_FRAGMENT", compoundButton.getText() + ": " + b);
@@ -567,7 +581,7 @@ public class ContentFragment extends Fragment {
 
         //Workaround. If this ever sees the light of a hospital many things need to be rewritten
         String[] linecharts = new String[]{
-                "VS_bloodsugar", "DiabetesMeasureBMI", "VS_bodyWeight", "DiabetesMeasureCreatinin", "DiabetesMeasureHbA1c", "DiabetesMeasureTriglyceride", "ike_chol"
+                "VS_bloodSugar", "DiabetesMeasureBMI", "VS_bodyWeight", "DiabetesMeasureCreatinin", "DiabetesMeasureHbA1c", "DiabetesMeasureTriglyceride", "ike_chol"
         };
 
         if (Arrays.asList(linecharts).contains(dataName)) {
