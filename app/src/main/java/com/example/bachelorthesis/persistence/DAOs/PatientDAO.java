@@ -29,6 +29,9 @@ public interface PatientDAO {
     @Query("Select * from patient where id = :id")
     PatientWithData findPatientWithData(long id);
 
+    @Query("Select * from patient where patient_number =:number")
+    Flowable<Patient> findPatientByPatientNumber(String number);
+
     @Query("Delete from patient")
     void nukePatients();
 }

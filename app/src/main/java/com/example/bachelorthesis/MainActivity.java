@@ -2,6 +2,7 @@ package com.example.bachelorthesis;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -31,12 +33,18 @@ import com.example.bachelorthesis.PatientRecyclerView.PatientVisualizationCallba
 import com.example.bachelorthesis.exceptions.SearchInputException;
 import com.example.bachelorthesis.persistence.databases.AppDataBase;
 import com.example.bachelorthesis.persistence.entities.Patient;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -53,11 +61,14 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
     private Fragment contentFragment = null;
 
     private PatientListAdapter patientListAdapter;
+    private RecyclerView recyclerView;
 
     private TextInputEditText searchBar;
     private TextInputLayout searchBarLayout;
 
     private List<Patient> patients;
+
+    private String intentPatient = null;
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -65,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
         Log.d("MAIN_ACTIVITY", "Main Activity launched");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         //Set Toolbar as Appbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -82,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         patientListAdapter = new PatientListAdapter(new ArrayList<>(), this, layoutManager);
 
-        RecyclerView recyclerView = findViewById(R.id.main_patient_recyclerview);
+        recyclerView = findViewById(R.id.main_patient_recyclerview);
         recyclerView.setAdapter(patientListAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutManager(layoutManager);
@@ -108,10 +118,10 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 try {
-                    if(!s.toString().isEmpty()) {
+                    if (!s.toString().isEmpty()) {
                         filterList(s);
                         searchBarLayout.setError(null);
-                    }else{
+                    } else {
                         updatePatientList(patients);
                     }
 
@@ -138,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
 
                     if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                         //ENTER
-                        Log.d("MAIN","Close Keyboard through EditorActionListener");
+                        Log.d("MAIN", "Close Keyboard through EditorActionListener");
                         closeKeyBoard();
                         return true;
                     }
@@ -148,6 +158,73 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
             }
         });
 
+
+        //external intent receive
+        // Get intent, action and MIME type
+        Intent intent = getIntent();
+        String action = intent.getAction();
+
+        if (Intent.ACTION_VIEW.equals(action)) {
+
+            Log.d("INTENT SCAN", intent.getDataString());
+
+            //processScanResults(intent.getDataString()); // Handle text being sent
+            intentPatient = intent.getDataString();
+
+        }
+
+
+        FloatingActionButton scanButton = findViewById(R.id.scanner_fab);
+        scanButton.setOnClickListener(this::startScanner);
+    }
+
+    public void startScanner(View v) {
+        IntentIntegrator intentIntegrator = new IntentIntegrator(this);
+        intentIntegrator.setPrompt("Scan a patient's code");
+        intentIntegrator.setOrientationLocked(true);
+        intentIntegrator.initiateScan();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        // if the intentResult is null then
+        // toast a message as "cancelled"
+        if (intentResult != null) {
+            if (intentResult.getContents() == null) {
+                Toast.makeText(getBaseContext(), "scan canceled!", Toast.LENGTH_SHORT).show();
+            } else {
+                if (BarcodeFormat.QR_CODE.name().equals(intentResult.getFormatName())
+                        && intentResult.getContents().contains("patient://")) {
+
+
+                    processScanResults(intentResult.getContents());
+                } else {
+                    Toast.makeText(getBaseContext(), "Invalid Code!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private void processScanResults(String result) {
+
+        result = result.replace("patient://", "");
+        try {
+            //scroll to thing in recyclerview & highlight it & launch fragment (done via callback)
+            int position = patientListAdapter.getPosition(result);
+            if(position==-1){
+                throw new NoSuchElementException();
+            }
+            patientListAdapter.clickAndScrollToPosition(position);
+
+            Toast.makeText(getBaseContext(), "Patient scanned succesfully!", Toast.LENGTH_SHORT).show();
+        } catch (NoSuchElementException e) {
+            Toast.makeText(getBaseContext(), "This QR-Code does not belong to any patient!",
+                    Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -226,6 +303,11 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
                 AppDataBase.getInstance(this).patientDAO().getAllPatients();
         patients = patientFlowable.blockingFirst();
         patientListAdapter.updateData(patients);
+
+        if(intentPatient!=null) {
+            processScanResults(intentPatient);
+
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")

@@ -96,6 +96,16 @@ public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.
 
     }
 
+    public int getPosition(String patientNUmber){
+        for (int i = 0; i < localDataSet.size(); i++) {
+            Patient p = localDataSet.get(i);
+            if (p.patientNumber.equals(patientNUmber)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public void clickAndScrollToPosition(int position) {
         layoutManager.scrollToPosition(position);
 

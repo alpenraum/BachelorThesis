@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.core.graphics.ColorUtils;
@@ -37,6 +38,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.zxing.integration.android.IntentIntegrator;
 import com.jmedeisis.draglinearlayout.DragLinearLayout;
 import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.leinardi.android.speeddial.SpeedDialView;
@@ -656,8 +658,12 @@ public class ContentFragment extends Fragment {
         });
 
 
+
+
         return view;
     }
+
+
 
     private void showLast24H() {
         LocalDate now = LocalDate.now();
