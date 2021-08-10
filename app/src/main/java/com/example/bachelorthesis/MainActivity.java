@@ -41,7 +41,6 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
@@ -49,25 +48,21 @@ import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements PatientVisualizationCallback {
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
+    private Patient user;
     private Fragment settingsFragment = null;
     private boolean settingsVisible = false;
-
     private Fragment contentFragment = null;
-
     private PatientListAdapter patientListAdapter;
-    private RecyclerView recyclerView;
-
     private TextInputEditText searchBar;
     private TextInputLayout searchBarLayout;
-
     private List<Patient> patients;
-
     private String intentPatient = null;
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -85,97 +80,114 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
         //Lock orientation based on device
         if (getResources().getBoolean(R.bool.portrait_only)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
+
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
-        }
-
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        patientListAdapter = new PatientListAdapter(new ArrayList<>(), this, layoutManager);
-
-        recyclerView = findViewById(R.id.main_patient_recyclerview);
-        recyclerView.setAdapter(patientListAdapter);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(),
-                DividerItemDecoration.VERTICAL));
-        recyclerView.setMinimumWidth(225);
 
 
-        searchBarLayout = findViewById(R.id.main_text_input_layout);
-        searchBar = findViewById(R.id.search_edit_text);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+            patientListAdapter = new PatientListAdapter(new ArrayList<>(), this, layoutManager);
+
+            RecyclerView recyclerView = findViewById(R.id.main_patient_recyclerview);
+            recyclerView.setAdapter(patientListAdapter);
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(),
+                    DividerItemDecoration.VERTICAL));
+            recyclerView.setMinimumWidth(225);
 
 
-        searchBarLayout.setEndIconOnClickListener(v -> {
-            updatePatientList(patients);
-            searchBar.setText("");
-        });
-        searchBar.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            searchBarLayout = findViewById(R.id.main_text_input_layout);
+            searchBar = findViewById(R.id.search_edit_text);
 
-            }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                try {
-                    if (!s.toString().isEmpty()) {
-                        filterList(s);
-                        searchBarLayout.setError(null);
-                    } else {
-                        updatePatientList(patients);
-                    }
+            searchBarLayout.setEndIconOnClickListener(v -> {
+                updatePatientList(patients);
+                searchBar.setText("");
+            });
+            searchBar.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-                } catch (SearchInputException e) {
-                    if (SearchInputException.Type.NAME == (e.getType())) {
-                        searchBarLayout.setError("Names do not contain numbers");
-                    } else if (SearchInputException.Type.NUMBER == e.getType()) {
-                        searchBarLayout.setError("Patient-nr. do not contain letters");
-                    } else {
-                        searchBarLayout.setError("Input only a name or number");
-                    }
                 }
-            }
 
-            @Override
-            public void afterTextChanged(Editable s) {
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    try {
+                        if (!s.toString().isEmpty()) {
+                            filterList(s);
+                            searchBarLayout.setError(null);
+                        } else {
+                            updatePatientList(patients);
+                        }
 
-            }
-        });
-        searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == KeyEvent.ACTION_DOWN) {
-
-                    if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                        //ENTER
-                        Log.d("MAIN", "Close Keyboard through EditorActionListener");
-                        closeKeyBoard();
-                        return true;
+                    } catch (SearchInputException e) {
+                        if (SearchInputException.Type.NAME == (e.getType())) {
+                            searchBarLayout.setError("Names do not contain numbers");
+                        } else if (SearchInputException.Type.NUMBER == e.getType()) {
+                            searchBarLayout.setError("Patient-nr. do not contain letters");
+                        } else {
+                            searchBarLayout.setError("Input only a name or number");
+                        }
                     }
                 }
 
-                return false;
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
+            searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    if (actionId == KeyEvent.ACTION_DOWN) {
+
+                        if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                            //ENTER
+                            Log.d("MAIN", "Close Keyboard through EditorActionListener");
+                            closeKeyBoard();
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+            });
+
+
+            //external intent receive
+            // Get intent, action and MIME type
+            Intent intent = getIntent();
+            String action = intent.getAction();
+
+            if (Intent.ACTION_VIEW.equals(action)) {
+
+                Log.d("INTENT SCAN", intent.getDataString());
+
+                //processScanResults(intent.getDataString()); // Handle text being sent
+                intentPatient = intent.getDataString();
+
             }
-        });
 
 
-        //external intent receive
-        // Get intent, action and MIME type
-        Intent intent = getIntent();
-        String action = intent.getAction();
-
-        if (Intent.ACTION_VIEW.equals(action)) {
-
-            Log.d("INTENT SCAN", intent.getDataString());
-
-            //processScanResults(intent.getDataString()); // Handle text being sent
-            intentPatient = intent.getDataString();
+            FloatingActionButton scanButton = findViewById(R.id.scanner_fab);
+            scanButton.setOnClickListener(this::startScanner);
 
         }
 
+        Single<Patient> patient =
+                AppDataBase.getInstance(this).patientDAO().findPatientByPatientNumber(
+                        "08001362");
 
-        FloatingActionButton scanButton = findViewById(R.id.scanner_fab);
-        scanButton.setOnClickListener(this::startScanner);
+        patient.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::handleUserFlowable, throwable -> {
+            Log.e("User Loading", "Error while loading the current user!");
+        });
+    }
+
+    private void handleUserFlowable(Patient patient) {
+        this.user = patient;
+        showPatientData(this.user);
     }
 
     public void startScanner(View v) {
@@ -215,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
         try {
             //scroll to thing in recyclerview & highlight it & launch fragment (done via callback)
             int position = patientListAdapter.getPosition(result);
-            if(position==-1){
+            if (position == -1) {
                 throw new NoSuchElementException();
             }
             patientListAdapter.clickAndScrollToPosition(position);
@@ -279,18 +291,18 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
     @Override
     protected void onStart() {
         super.onStart();
+        if (!getResources().getBoolean(R.bool.portrait_only)) {
+            Flowable<List<Patient>> patientFlowable =
+                    AppDataBase.getInstance(this).patientDAO().getAllPatients();
 
-        Flowable<List<Patient>> patientFlowable =
-                AppDataBase.getInstance(this).patientDAO().getAllPatients();
-
-        mDisposable.add(patientFlowable.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::updatePatientList, throwable -> Log.e("MainActivity", "Unable to" +
-                                " get " +
-                                "patients",
-                        throwable))
-        );
-
+            mDisposable.add(patientFlowable.subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::updatePatientList, throwable -> Log.e("MainActivity", "Unable to" +
+                                    " get " +
+                                    "patients",
+                            throwable))
+            );
+        }
 
     }
 
@@ -298,15 +310,16 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
     protected void onResume() {
         super.onResume();
 
+        if (!getResources().getBoolean(R.bool.portrait_only)) {
+            Flowable<List<Patient>> patientFlowable =
+                    AppDataBase.getInstance(this).patientDAO().getAllPatients();
+            patients = patientFlowable.blockingFirst();
+            patientListAdapter.updateData(patients);
 
-        Flowable<List<Patient>> patientFlowable =
-                AppDataBase.getInstance(this).patientDAO().getAllPatients();
-        patients = patientFlowable.blockingFirst();
-        patientListAdapter.updateData(patients);
+            if (intentPatient != null) {
+                processScanResults(intentPatient);
 
-        if(intentPatient!=null) {
-            processScanResults(intentPatient);
-
+            }
         }
     }
 
@@ -321,8 +334,9 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
     @Override
     protected void onStop() {
         super.onStop();
-
-        mDisposable.clear();
+        if (!getResources().getBoolean(R.bool.portrait_only)) {
+            mDisposable.clear();
+        }
     }
 
 

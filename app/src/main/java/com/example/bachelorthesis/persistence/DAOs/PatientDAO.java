@@ -12,6 +12,7 @@ import com.example.bachelorthesis.persistence.entities.relations.PatientWithData
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Single;
 
 /**
  * @author Finn Zimmer
@@ -30,7 +31,7 @@ public interface PatientDAO {
     PatientWithData findPatientWithData(long id);
 
     @Query("Select * from patient where patient_number =:number")
-    Flowable<Patient> findPatientByPatientNumber(String number);
+    Single<Patient> findPatientByPatientNumber(String number);
 
     @Query("Delete from patient")
     void nukePatients();

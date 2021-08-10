@@ -157,13 +157,15 @@ public class ContentFragment extends Fragment {
 
     private void generateChips(ChipGroup cG) {
 
-        cG.addView(genChip(getResources().getString(R.string.treatment), cG));
-        cG.addView(genChip(getResources().getString(R.string.risk), cG));
+        if(!getResources().getBoolean(R.bool.portrait_only)) {
+            cG.addView(genChip(getResources().getString(R.string.treatment), cG));
+            cG.addView(genChip(getResources().getString(R.string.risk), cG));
+            cG.addView(genChip(getResources().getString(R.string.m_chol), cG));
+        }
         cG.addView(genChip(getResources().getString(R.string.m_bloodsugar), cG));
         cG.addView(genChip(getResources().getString(R.string.m_bmi), cG));
         cG.addView(genChip(getResources().getString(R.string.m_bodyweight), cG));
         cG.addView(genChip(getResources().getString(R.string.bloodpressure), cG));
-        cG.addView(genChip(getResources().getString(R.string.m_chol), cG));
         cG.addView(genChip(getResources().getString(R.string.m_creatinin), cG));
         cG.addView(genChip(getResources().getString(R.string.m_hba1c), cG));
         cG.addView(genChip(getResources().getString(R.string.m_triglyceride), cG));
@@ -247,7 +249,11 @@ public class ContentFragment extends Fragment {
         if (chartViewMap.containsKey(dataName)) {
             View chartView = chartViewMap.get(dataName);
             //chartLayout.removeView(chartView);
-            chartLayout.removeDragView(chartView);
+            if(getResources().getBoolean(R.bool.portrait_only)){
+                chartLayout.removeView(chartView);
+            }else {
+                chartLayout.removeDragView(chartView);
+            }
             chartViewMap.remove(dataName);
         }
     }
@@ -326,12 +332,11 @@ public class ContentFragment extends Fragment {
         xAxis.setTextSize(12.0f);
 
         chartViewMap.put(dataName, chartLayoutView);
-        chartLayout.addDragView(chartLayoutView, chartLayoutView);
-        //chartLayout.addView(chartLayoutView);
+        addChartToView(chart, chartLayout);
 
         return chart;
     }
-
+    //TODO: ADAPT TO MOBILE LAYOUT
     private ScatterChart createScatterChart(String dataName) {
         View chartLayoutView = getLayoutInflater().inflate(R.layout.scatterchart_layout,
                 chartLayout,
@@ -399,11 +404,17 @@ public class ContentFragment extends Fragment {
         xAxis.setTextSize(12.0f);
 
         chartViewMap.put(dataName, chartLayoutView);
-        //chartLayout.addView(chartLayoutView);
 
-        chartLayout.addDragView(chartLayoutView, chartLayoutView);
 
+        addChartToView(chart, chartLayout);
         return chart;
+    }
+
+    private void addChartToView(Chart chart, DragLinearLayout layout){
+        layout.addView(chart);
+        if(!getResources().getBoolean(R.bool.portrait_only)){
+            layout.setViewDraggable(chart,chart);
+        }
     }
 
     private void genTreatmentScatterChart(String dataName) {
@@ -626,38 +637,40 @@ public class ContentFragment extends Fragment {
 
 
 
-        SpeedDialView fab = view.findViewById(R.id.fab);
-        fab.inflate(R.menu.granularity_fab_menu);
-        fab.setOnActionSelectedListener(actionItem -> {
-
-            switch (actionItem.getId()) {
-                case R.id.last24h:
-                    Log.d("FAB","24H PRESSED");
-                    showLast24H();
-                    break;
-                case R.id.last_week:
-                    showLastWeek();
-                    break;
-
-                case R.id.last_month:
-                    showLastMonth();
-                    break;
-
-                case R.id.allData:
-                    showWholeData();
-                    break;
-
-                default:
-                    return false;
-
-            }
-
-            fab.close();
-
-            return true;
-        });
 
 
+        if (!getResources().getBoolean(R.bool.portrait_only)) {
+            SpeedDialView fab = view.findViewById(R.id.fab);
+            fab.inflate(R.menu.granularity_fab_menu);
+            fab.setOnActionSelectedListener(actionItem -> {
+
+                switch (actionItem.getId()) {
+                    case R.id.last24h:
+                        Log.d("FAB", "24H PRESSED");
+                        showLast24H();
+                        break;
+                    case R.id.last_week:
+                        showLastWeek();
+                        break;
+
+                    case R.id.last_month:
+                        showLastMonth();
+                        break;
+
+                    case R.id.allData:
+                        showWholeData();
+                        break;
+
+                    default:
+                        return false;
+
+                }
+
+                fab.close();
+
+                return true;
+            });
+        }
 
 
         return view;

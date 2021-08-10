@@ -7,41 +7,35 @@
     tools:context=".ContentFragment">
 
 
-
-        <ScrollView
-            android:id="@+id/content_chart_scrollview"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="?actionBarSize"
-            android:layout_marginBottom="128dp">
-
-            <com.jmedeisis.draglinearlayout.DragLinearLayout
-                android:id="@+id/content_chart_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"/>
-        </ScrollView>
-
-
-
-
-
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/content_chipgroup"
+    <com.jmedeisis.draglinearlayout.DragLinearLayout
+        android:id="@+id/content_chart_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        app:chipSpacingVertical="5dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-    </com.google.android.material.chip.ChipGroup>
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/content_chipgroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            app:chipSpacingVertical="5dp">
+
+        </com.google.android.material.chip.ChipGroup>
+
+    </HorizontalScrollView>
 
     <com.leinardi.android.speeddial.SpeedDialOverlayLayout
         android:id="@+id/overlay"
@@ -51,26 +45,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <com.leinardi.android.speeddial.SpeedDialView
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="116dp"
-        android:contentDescription="@string/show_different_granularities_of_the_data"
-        android:textColor="@android:color/white"
-        app:sdMainFabClosedSrc="@drawable/ic_baseline_timelapse_24"
-        app:sdMainFabClosedIconColor="@android:color/white"
-        app:sdMainFabOpenedIconColor="@android:color/white"
-        app:sdMainFabOpenedSrc="@drawable/ic_baseline_close_24"
-        app:sdExpansionMode="top"
-        app:sdOverlayLayout="@id/overlay"
-
-
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Bachelor Thesis</string>
+    <string name="app_name">explorandum naturalis</string>
     <string name="shared_pref_name">visMaster</string>
     <string name="action_settings">settings</string>
     <string name="settings">Settings</string>
