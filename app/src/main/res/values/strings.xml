@@ -6,6 +6,7 @@
     <string name="deleteData">Delete Data</string>
     <string name="close">Close</string>
     <string name="app_icon">App icon</string>
+    <string name="greeting">Hi %1$s!</string>
 
 
     <!--Data Types -->

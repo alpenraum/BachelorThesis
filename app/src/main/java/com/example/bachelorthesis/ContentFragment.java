@@ -2,15 +2,14 @@ package com.example.bachelorthesis;
 
 import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
-import android.icu.util.LocaleData;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.cardview.widget.CardView;
 import androidx.core.graphics.ColorUtils;
 import androidx.fragment.app.Fragment;
 
@@ -21,6 +20,7 @@ import com.example.bachelorthesis.persistence.entities.Patient;
 import com.example.bachelorthesis.persistence.entities.PatientDataRecord;
 import com.example.bachelorthesis.persistence.entities.relations.PatientWithData;
 import com.example.bachelorthesis.utils.Concurrency;
+import com.example.bachelorthesis.utils.CustomColorUtils;
 import com.example.bachelorthesis.utils.DataType;
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
@@ -38,19 +38,12 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
-import com.google.zxing.integration.android.IntentIntegrator;
 import com.jmedeisis.draglinearlayout.DragLinearLayout;
-import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.leinardi.android.speeddial.SpeedDialView;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -87,8 +80,6 @@ public class ContentFragment extends Fragment {
     private final OnDataLoadedCallback onDataLoadedCallback = this::updateDataset;
     private DragLinearLayout chartLayout;
     private Long firstDataEntry = 0L;
-
-
 
 
     public ContentFragment() {
@@ -157,10 +148,13 @@ public class ContentFragment extends Fragment {
 
     private void generateChips(ChipGroup cG) {
 
-        if(!getResources().getBoolean(R.bool.portrait_only)) {
+        if (!getResources().getBoolean(R.bool.portrait_only)) {
             cG.addView(genChip(getResources().getString(R.string.treatment), cG));
             cG.addView(genChip(getResources().getString(R.string.risk), cG));
             cG.addView(genChip(getResources().getString(R.string.m_chol), cG));
+        }else{
+            cG.setSelectionRequired(true);
+            cG.setSingleSelection(true);
         }
         cG.addView(genChip(getResources().getString(R.string.m_bloodsugar), cG));
         cG.addView(genChip(getResources().getString(R.string.m_bmi), cG));
@@ -177,23 +171,23 @@ public class ContentFragment extends Fragment {
         allChip.setText(name);
 
 
-
-        int states[][] = new int[][]{
+        int[][] states = new int[][]{
                 new int[]{android.R.attr.state_checked},
                 new int[]{-android.R.attr.state_checked}
         };
-        int color = getContext().getColor(DataType.valueOfName(name).getColor());
-        int colors[] = new int[]{
+        int color = requireContext().getColor(DataType.valueOfName(name).getColor());
+        int[] colors = new int[]{
                 color,
-                ColorUtils.setAlphaComponent(color,255/4)
+                ColorUtils.setAlphaComponent(color, 255 / 4)
         };
 
-        allChip.setChipBackgroundColor(new ColorStateList(states,colors));
+        allChip.setChipBackgroundColor(new ColorStateList(states, colors));
 
         allChip.setOnCheckedChangeListener((compoundButton, b) -> {
             Log.d("CONTENT_FRAGMENT", compoundButton.getText() + ": " + b);
 
             if (b) {
+
                 showChart(String.valueOf(compoundButton.getText()));
             } else {
                 hideChart(String.valueOf(compoundButton.getText()));
@@ -249,9 +243,9 @@ public class ContentFragment extends Fragment {
         if (chartViewMap.containsKey(dataName)) {
             View chartView = chartViewMap.get(dataName);
             //chartLayout.removeView(chartView);
-            if(getResources().getBoolean(R.bool.portrait_only)){
+            if (getResources().getBoolean(R.bool.portrait_only)) {
                 chartLayout.removeView(chartView);
-            }else {
+            } else {
                 chartLayout.removeDragView(chartView);
             }
             chartViewMap.remove(dataName);
@@ -271,12 +265,25 @@ public class ContentFragment extends Fragment {
                 false);
         LineChart chart = chartLayoutView.findViewById(R.id.line_chart);
         ((TextView) chartLayoutView.findViewById(R.id.chart_title)).setText(dataName);
-        chartLayoutView.findViewById(R.id.close_button).setOnClickListener(
-                view -> {
-                    if (chipMap.containsKey(dataName)) {
-                        Objects.requireNonNull(chipMap.get(dataName)).setChecked(false);
-                    }
-                });
+
+        if (getResources().getBoolean(R.bool.portrait_only)) {
+
+            DataType d = DataType.valueOfName(dataName);
+            ((CardView) chartLayoutView.findViewById(R.id.line_cardview))
+                    .setCardBackgroundColor(requireContext().getColor(d.getColor()));
+            int textColor = CustomColorUtils.isBrightColor(d.getColor())?
+                    getContext().getColor(R.color.black):
+                    getContext().getColor(R.color.white);
+
+            ((TextView) chartLayoutView.findViewById(R.id.chart_title)).setTextColor(textColor);
+        } else {
+            chartLayoutView.findViewById(R.id.close_button).setOnClickListener(
+                    view -> {
+                        if (chipMap.containsKey(dataName)) {
+                            Objects.requireNonNull(chipMap.get(dataName)).setChecked(false);
+                        }
+                    });
+        }
         chart.getDescription().setText(dataName);
         chart.getDescription().setEnabled(false);
 
@@ -332,11 +339,11 @@ public class ContentFragment extends Fragment {
         xAxis.setTextSize(12.0f);
 
         chartViewMap.put(dataName, chartLayoutView);
-        addChartToView(chart, chartLayout);
+        addViewToDragLinearLayout(chartLayoutView, chartLayout);
 
         return chart;
     }
-    //TODO: ADAPT TO MOBILE LAYOUT
+
     private ScatterChart createScatterChart(String dataName) {
         View chartLayoutView = getLayoutInflater().inflate(R.layout.scatterchart_layout,
                 chartLayout,
@@ -406,14 +413,14 @@ public class ContentFragment extends Fragment {
         chartViewMap.put(dataName, chartLayoutView);
 
 
-        addChartToView(chart, chartLayout);
+        addViewToDragLinearLayout(chart, chartLayout);
         return chart;
     }
 
-    private void addChartToView(Chart chart, DragLinearLayout layout){
-        layout.addView(chart);
-        if(!getResources().getBoolean(R.bool.portrait_only)){
-            layout.setViewDraggable(chart,chart);
+    private void addViewToDragLinearLayout(View chartView, DragLinearLayout layout) {
+        layout.addView(chartView);
+        if (!getResources().getBoolean(R.bool.portrait_only)) {
+            layout.setViewDraggable(chartView, chartView);
         }
     }
 
@@ -516,12 +523,16 @@ public class ContentFragment extends Fragment {
         sortData(data);
         LineDataSet lineDataSet = new LineDataSet(data, dataName);
         DataType d = DataType.valueOfName(dataName);
-        lineDataSet.setColor(requireContext().getColor(d.getColor()));
+        if(getResources().getBoolean(R.bool.portrait_only)) {
+            lineDataSet.setColor(requireContext().getColor(R.color.primary));
+
+        }else{
+            lineDataSet.setColor(requireContext().getColor(d.getColor()));
+        }
         lineDataSet.setHighlightEnabled(true);
         lineDataSet.setLineWidth(3.0f);
         lineDataSet.setDrawValues(false);
         lineDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-
         chart.setData(new LineData(lineDataSet));
         chart.invalidate();
         chart.setMarker(new LineMarkerView(getContext(), R.layout.custom_marker,
@@ -592,6 +603,8 @@ public class ContentFragment extends Fragment {
 
     private void showChart(String dataName) {
 
+
+
         //Workaround. If this ever sees the light of a hospital many things need to be rewritten
         String[] linecharts = new String[]{
                 "VS_bloodSugar", "DiabetesMeasureBMI", "VS_bodyWeight", "DiabetesMeasureCreatinin", "DiabetesMeasureHbA1c", "DiabetesMeasureTriglyceride", "ike_chol"
@@ -636,9 +649,6 @@ public class ContentFragment extends Fragment {
         chartLayout.setContainerScrollView(view.findViewById(R.id.content_chart_scrollview));
 
 
-
-
-
         if (!getResources().getBoolean(R.bool.portrait_only)) {
             SpeedDialView fab = view.findViewById(R.id.fab);
             fab.inflate(R.menu.granularity_fab_menu);
@@ -677,16 +687,15 @@ public class ContentFragment extends Fragment {
     }
 
 
-
     private void showLast24H() {
         LocalDate now = LocalDate.now();
         long yesterday = now.minusDays(1).atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000;
 
-        if(!charts.isEmpty()) {
+        if (!charts.isEmpty()) {
             showWholeData();
             LineChart chart = (LineChart) charts.get(0);
-            float scaleFactor = (System.currentTimeMillis()-firstDataEntry)/(1000.0f*60.0f*60.0f*24.0f);
-            chart.zoom(scaleFactor,1.0f,(System.currentTimeMillis()-yesterday)/2.0f,0.0f);
+            float scaleFactor = (System.currentTimeMillis() - firstDataEntry) / (1000.0f * 60.0f * 60.0f * 24.0f);
+            chart.zoom(scaleFactor, 1.0f, (System.currentTimeMillis() - yesterday) / 2.0f, 0.0f);
             SyncChartsListener.syncCharts(chart, getOtherCharts(chart));
         }
     }
@@ -695,11 +704,11 @@ public class ContentFragment extends Fragment {
         LocalDate now = LocalDate.now();
         long lastWeek = now.minusWeeks(1).atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000;
 
-        if(!charts.isEmpty()) {
+        if (!charts.isEmpty()) {
             showWholeData();
             LineChart chart = (LineChart) charts.get(0);
-            float scaleFactor = (System.currentTimeMillis()-firstDataEntry)/(1000.0f*60.0f*60.0f*24.0f);
-            chart.zoom(scaleFactor/7.0f,1.0f,(System.currentTimeMillis()-lastWeek)/2.0f,0.0f);
+            float scaleFactor = (System.currentTimeMillis() - firstDataEntry) / (1000.0f * 60.0f * 60.0f * 24.0f);
+            chart.zoom(scaleFactor / 7.0f, 1.0f, (System.currentTimeMillis() - lastWeek) / 2.0f, 0.0f);
             SyncChartsListener.syncCharts(chart, getOtherCharts(chart));
         }
     }
@@ -707,20 +716,20 @@ public class ContentFragment extends Fragment {
     private void showLastMonth() {
         LocalDate now = LocalDate.now();
         long lastMonth = now.minusMonths(1).atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000;
-        if(!charts.isEmpty()) {
+        if (!charts.isEmpty()) {
 
             showWholeData();
             LineChart chart = (LineChart) charts.get(0);
-            float scaleFactor = (System.currentTimeMillis()-firstDataEntry)/(1000.0f*60.0f*60.0f*24.0f);
-            chart.zoom(scaleFactor/30.0f,1.0f,(System.currentTimeMillis()-lastMonth)/2.0f,0.0f);
+            float scaleFactor = (System.currentTimeMillis() - firstDataEntry) / (1000.0f * 60.0f * 60.0f * 24.0f);
+            chart.zoom(scaleFactor / 30.0f, 1.0f, (System.currentTimeMillis() - lastMonth) / 2.0f, 0.0f);
             SyncChartsListener.syncCharts(chart, getOtherCharts(chart));
         }
     }
 
     private void showWholeData() {
-        if(!charts.isEmpty()) {
+        if (!charts.isEmpty()) {
             LineChart chart = (LineChart) charts.get(0);
-            chart.zoom(0.00000000001f,1.0f,0.0f,0.0f);
+            chart.zoom(0.00000000001f, 1.0f, 0.0f, 0.0f);
             SyncChartsListener.syncCharts(chart, getOtherCharts(chart));
         }
     }
@@ -756,6 +765,9 @@ public class ContentFragment extends Fragment {
                     }
                     return 1;
                 }).timeStamp.getTime();
+
+
+        chipMap.get(getString(R.string.m_bloodsugar)).setChecked(true);
     }
 
     //interface for loading data with callback

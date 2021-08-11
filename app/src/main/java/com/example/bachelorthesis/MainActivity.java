@@ -55,7 +55,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class MainActivity extends AppCompatActivity implements PatientVisualizationCallback {
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
-    private Patient user;
     private Fragment settingsFragment = null;
     private boolean settingsVisible = false;
     private Fragment contentFragment = null;
@@ -80,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
         //Lock orientation based on device
         if (getResources().getBoolean(R.bool.portrait_only)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
+
 
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
@@ -137,21 +137,18 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
 
                 }
             });
-            searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                @Override
-                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                    if (actionId == KeyEvent.ACTION_DOWN) {
+            searchBar.setOnEditorActionListener((v, actionId, event) -> {
+                if (actionId == KeyEvent.ACTION_DOWN) {
 
-                        if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                            //ENTER
-                            Log.d("MAIN", "Close Keyboard through EditorActionListener");
-                            closeKeyBoard();
-                            return true;
-                        }
+                    if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                        //ENTER
+                        Log.d("MAIN", "Close Keyboard through EditorActionListener");
+                        closeKeyBoard();
+                        return true;
                     }
-
-                    return false;
                 }
+
+                return false;
             });
 
 
@@ -174,20 +171,20 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
             scanButton.setOnClickListener(this::startScanner);
 
         }
+        if(getResources().getBoolean(R.bool.portrait_only)) {
+            Single<Patient> patient =
+                    AppDataBase.getInstance(this).patientDAO().findPatientByPatientNumber(
+                            "08001362");
 
-        Single<Patient> patient =
-                AppDataBase.getInstance(this).patientDAO().findPatientByPatientNumber(
-                        "08001362");
-
-        patient.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::handleUserFlowable, throwable -> {
-            Log.e("User Loading", "Error while loading the current user!");
-        });
+            patient.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::handleUserFlowable, throwable -> {
+                        Log.e("User Loading", "Error while loading the current user!");
+                    });
+        }
     }
 
     private void handleUserFlowable(Patient patient) {
-        this.user = patient;
-        showPatientData(this.user);
+        showPatientData(patient);
     }
 
     public void startScanner(View v) {
@@ -274,12 +271,12 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
         } else {
             char[] chars = stringInput.toCharArray();
             int letters = 0;
-            for (int i = 0; i < chars.length; i++) {
+            for (char aChar : chars) {
                 if (letters >= chars.length / 2) { //more letters than digits -> name
                     throw new SearchInputException("No Valid input",
                             SearchInputException.Type.NAME);
                 }
-                if (String.valueOf(chars[i]).matches("^[a-zA-Z\\-\\s]+$")) {
+                if (String.valueOf(aChar).matches("^[a-zA-Z\\-\\s]+$")) {
                     letters++;
                 }
             }

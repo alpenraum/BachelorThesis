@@ -10,6 +10,7 @@ import androidx.core.graphics.ColorUtils;
 
 import com.example.bachelorthesis.R;
 import com.example.bachelorthesis.persistence.entities.PatientDataRecord;
+import com.example.bachelorthesis.utils.CustomColorUtils;
 import com.github.mikephil.charting.components.MarkerView;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
@@ -59,7 +60,7 @@ public class LineMarkerView extends MarkerView {
 
         rootView = findViewById(R.id.marker_root);
         this.backgroundColor = ColorUtils.setAlphaComponent(backgroundColor,127);
-        this.textColor = isBrightColor(backgroundColor)?
+        this.textColor = CustomColorUtils.isBrightColor(backgroundColor)?
                 getContext().getColor(R.color.black):
                 getContext().getColor(R.color.white);
 
@@ -110,22 +111,5 @@ public class LineMarkerView extends MarkerView {
         return pointF;
     }
 
-    public static boolean isBrightColor(int color) {
-        if (android.R.color.transparent == color)
-            return false;
 
-        boolean rtnValue = false;
-
-        int[] rgb = { Color.red(color), Color.green(color), Color.blue(color) };
-
-        int brightness = (int) Math.sqrt(rgb[0] * rgb[0] * .241 + rgb[1]
-                * rgb[1] * .691 + rgb[2] * rgb[2] * .068);
-
-        // color is light
-        if (brightness >= 200) {
-            rtnValue = true;
-        }
-
-        return rtnValue;
-    }
 }
