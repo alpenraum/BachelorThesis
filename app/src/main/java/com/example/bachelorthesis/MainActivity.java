@@ -64,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
     private List<Patient> patients;
     private String intentPatient = null;
 
+    private Patient user;
+
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -196,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
                 getString(R.string.m_triglyceride),
                 getString(R.string.m_creatinin)
         };
-        AddDataBottomSheet sheet = new AddDataBottomSheet(measurements);
+        AddDataBottomSheet sheet = new AddDataBottomSheet(measurements, this.user.id);
         sheet.show(getSupportFragmentManager(),"addDataBottomSheet");
 
 
@@ -205,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
 
 
     private void handleUserFlowable(Patient patient) {
+        this.user = patient;
         showPatientData(patient);
     }
 

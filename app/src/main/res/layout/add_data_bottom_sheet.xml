@@ -157,6 +157,36 @@
             app:layout_constraintTop_toBottomOf="@+id/enter_data2_input_layout"
             android:checked="true"/>
 
+        <EditText
+            android:id="@+id/editTextDate2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:ems="10"
+            android:inputType="date"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@+id/switch1"
+            app:layout_constraintTop_toBottomOf="@+id/switch1"
+            tools:visibility="visible"
+            android:focusable="false"
+            android:longClickable="false"/>
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/save_data_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:clickable="true"
+            android:contentDescription="Save"
+            android:text="Save"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF"
+            app:fabSize="auto"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/switch1" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
