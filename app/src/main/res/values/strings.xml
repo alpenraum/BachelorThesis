@@ -7,6 +7,7 @@
     <string name="close">Close</string>
     <string name="app_icon">App icon</string>
     <string name="greeting">Hi %1$s!</string>
+    <string name="enterData">Enter your %1$s</string>
 
 
     <!--Data Types -->

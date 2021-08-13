@@ -14,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -33,6 +32,7 @@ import com.example.bachelorthesis.PatientRecyclerView.PatientVisualizationCallba
 import com.example.bachelorthesis.exceptions.SearchInputException;
 import com.example.bachelorthesis.persistence.databases.AppDataBase;
 import com.example.bachelorthesis.persistence.entities.Patient;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -80,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
         if (getResources().getBoolean(R.bool.portrait_only)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
 
+            ExtendedFloatingActionButton addData = findViewById(R.id.add_data_fab);
+            addData.setOnClickListener((view)-> showAddDataFragment());
 
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
@@ -182,6 +184,25 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
                     });
         }
     }
+
+
+    private void showAddDataFragment(){
+        String[] measurements = new String[] {
+                getString(R.string.m_bloodsugar),
+                getString(R.string.m_bmi),
+                getString(R.string.m_bodyweight),
+                getString(R.string.bloodpressure),
+                getString(R.string.m_hba1c),
+                getString(R.string.m_triglyceride),
+                getString(R.string.m_creatinin)
+        };
+        AddDataBottomSheet sheet = new AddDataBottomSheet(measurements);
+        sheet.show(getSupportFragmentManager(),"addDataBottomSheet");
+
+
+    }
+
+
 
     private void handleUserFlowable(Patient patient) {
         showPatientData(patient);
