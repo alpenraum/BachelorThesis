@@ -198,10 +198,14 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
                 getString(R.string.m_triglyceride),
                 getString(R.string.m_creatinin)
         };
-        AddDataBottomSheet sheet = new AddDataBottomSheet(measurements, this.user.id);
+        AddDataBottomSheet sheet = new AddDataBottomSheet(measurements, this.user.id,this::reloadData);
         sheet.show(getSupportFragmentManager(),"addDataBottomSheet");
 
 
+    }
+
+    private void reloadData(){
+        showPatientData(user);
     }
 
 

@@ -152,7 +152,7 @@ public class ContentFragment extends Fragment {
             cG.addView(genChip(getResources().getString(R.string.treatment), cG));
             cG.addView(genChip(getResources().getString(R.string.risk), cG));
             cG.addView(genChip(getResources().getString(R.string.m_chol), cG));
-        }else{
+        } else {
             cG.setSelectionRequired(true);
             cG.setSingleSelection(true);
         }
@@ -271,8 +271,8 @@ public class ContentFragment extends Fragment {
             DataType d = DataType.valueOfName(dataName);
             ((CardView) chartLayoutView.findViewById(R.id.line_cardview))
                     .setCardBackgroundColor(requireContext().getColor(d.getColor()));
-            int textColor = CustomColorUtils.isBrightColor(d.getColor())?
-                    getContext().getColor(R.color.black):
+            int textColor = CustomColorUtils.isBrightColor(d.getColor()) ?
+                    getContext().getColor(R.color.black) :
                     getContext().getColor(R.color.white);
 
             ((TextView) chartLayoutView.findViewById(R.id.chart_title)).setTextColor(textColor);
@@ -523,10 +523,10 @@ public class ContentFragment extends Fragment {
         sortData(data);
         LineDataSet lineDataSet = new LineDataSet(data, dataName);
         DataType d = DataType.valueOfName(dataName);
-        if(getResources().getBoolean(R.bool.portrait_only)) {
+        if (getResources().getBoolean(R.bool.portrait_only)) {
             lineDataSet.setColor(requireContext().getColor(R.color.primary));
 
-        }else{
+        } else {
             lineDataSet.setColor(requireContext().getColor(d.getColor()));
         }
         lineDataSet.setHighlightEnabled(true);
@@ -604,7 +604,6 @@ public class ContentFragment extends Fragment {
     private void showChart(String dataName) {
 
 
-
         //Workaround. If this ever sees the light of a hospital many things need to be rewritten
         String[] linecharts = new String[]{
                 "VS_bloodSugar", "DiabetesMeasureBMI", "VS_bodyWeight", "DiabetesMeasureCreatinin", "DiabetesMeasureHbA1c", "DiabetesMeasureTriglyceride", "ike_chol"
@@ -649,38 +648,36 @@ public class ContentFragment extends Fragment {
         chartLayout.setContainerScrollView(view.findViewById(R.id.content_chart_scrollview));
 
 
-        if (!getResources().getBoolean(R.bool.portrait_only)) {
-            SpeedDialView fab = view.findViewById(R.id.fab);
-            fab.inflate(R.menu.granularity_fab_menu);
-            fab.setOnActionSelectedListener(actionItem -> {
+        SpeedDialView fab = view.findViewById(R.id.fab);
+        fab.inflate(R.menu.granularity_fab_menu);
+        fab.setOnActionSelectedListener(actionItem -> {
 
-                switch (actionItem.getId()) {
-                    case R.id.last24h:
-                        Log.d("FAB", "24H PRESSED");
-                        showLast24H();
-                        break;
-                    case R.id.last_week:
-                        showLastWeek();
-                        break;
+            switch (actionItem.getId()) {
+                case R.id.last24h:
+                    Log.d("FAB", "24H PRESSED");
+                    showLast24H();
+                    break;
+                case R.id.last_week:
+                    showLastWeek();
+                    break;
 
-                    case R.id.last_month:
-                        showLastMonth();
-                        break;
+                case R.id.last_month:
+                    showLastMonth();
+                    break;
 
-                    case R.id.allData:
-                        showWholeData();
-                        break;
+                case R.id.allData:
+                    showWholeData();
+                    break;
 
-                    default:
-                        return false;
+                default:
+                    return false;
 
-                }
+            }
 
-                fab.close();
+            fab.close();
 
-                return true;
-            });
-        }
+            return true;
+        });
 
 
         return view;
