@@ -413,7 +413,7 @@ public class ContentFragment extends Fragment {
         chartViewMap.put(dataName, chartLayoutView);
 
 
-        addViewToDragLinearLayout(chart, chartLayout);
+        addViewToDragLinearLayout(chartLayoutView, chartLayout);
         return chart;
     }
 
@@ -545,6 +545,7 @@ public class ContentFragment extends Fragment {
 
         if (!charts.isEmpty()) {
             SyncChartsListener.syncCharts(charts.get(0), new Chart[]{chart});
+            chart.invalidate();
         }
 
         charts.add(chart);
@@ -675,7 +676,9 @@ public class ContentFragment extends Fragment {
             }
 
             fab.close();
-
+            for (Chart<?> chart : charts) {
+                chart.invalidate();
+            }
             return true;
         });
 
@@ -763,8 +766,9 @@ public class ContentFragment extends Fragment {
                     return 1;
                 }).timeStamp.getTime();
 
-
-        chipMap.get(getString(R.string.m_bloodsugar)).setChecked(true);
+        if(getResources().getBoolean(R.bool.portrait_only)) {
+            chipMap.get(getString(R.string.m_bloodsugar)).setChecked(true);
+        }
     }
 
     //interface for loading data with callback

@@ -16,18 +16,18 @@
         app:layout_constraintVertical_bias="0.0">
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/line_cardview"
             android:layout_width="820dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
+            android:padding="5dp"
             app:cardCornerRadius="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:padding="5dp"
-           >
+            app:layout_constraintTop_toTopOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
@@ -73,10 +73,10 @@
                     android:id="@+id/line_chart"
                     android:layout_width="820dp"
                     android:layout_height="250dp"
-                    android:clipChildren="false"
-                    android:clipToPadding="false"
-
                     android:background="@color/design_default_color_background"
+                    android:clipChildren="false"
+
+                    android:clipToPadding="false"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
