@@ -139,9 +139,9 @@ public class AddDataBottomSheet extends BottomSheetDialogFragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    view.findViewById(R.id.editTextDate2).setVisibility(View.GONE);
+                    view.findViewById(R.id.textinputlayout_date).setVisibility(View.GONE);
                 } else {
-                    view.findViewById(R.id.editTextDate2).setVisibility(View.VISIBLE);
+                    view.findViewById(R.id.textinputlayout_date).setVisibility(View.VISIBLE);
                 }
             }
         });

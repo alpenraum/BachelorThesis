@@ -3,14 +3,19 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/drawable/circle.xml" value="0.3828125" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/drawable/ic_round_drag_handle_24.xml" value="0.3828125" />
+        <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout-sw600dp/chip_filter.xml" value="1.0" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout-sw600dp/fragment_content.xml" value="0.275" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout-sw600dp/linechart_layout.xml" value="0.275" />
+        <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout-sw600dp/trend_notification.xml" value="0.6875" />
+        <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout/add_data_bottom_sheet.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout/chip_filter.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout/custom_marker.xml" value="0.2749094202898551" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout/fragment_content.xml" value="0.5" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout/linechart_layout.xml" value="1.0" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout/scatterchart_layout.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout/trend_notification.xml" value="3.0" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/menu/granularity_fab_menu.xml" value="0.36666666666666664" />
       </map>
     </option>

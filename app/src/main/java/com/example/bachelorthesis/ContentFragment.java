@@ -3,6 +3,7 @@ package com.example.bachelorthesis;
 import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,7 @@ import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.ScatterChart;
 import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -38,6 +40,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.snackbar.Snackbar;
 import com.jmedeisis.draglinearlayout.DragLinearLayout;
 import com.leinardi.android.speeddial.SpeedDialView;
 
@@ -80,6 +83,8 @@ public class ContentFragment extends Fragment {
     private final OnDataLoadedCallback onDataLoadedCallback = this::updateDataset;
     private DragLinearLayout chartLayout;
     private Long firstDataEntry = 0L;
+
+    private LayoutInflater inflater;
 
 
     public ContentFragment() {
@@ -148,11 +153,7 @@ public class ContentFragment extends Fragment {
 
     private void generateChips(ChipGroup cG) {
 
-        if (!getResources().getBoolean(R.bool.portrait_only)) {
-            cG.addView(genChip(getResources().getString(R.string.treatment), cG));
-            cG.addView(genChip(getResources().getString(R.string.risk), cG));
-            cG.addView(genChip(getResources().getString(R.string.m_chol), cG));
-        } else {
+        if (getResources().getBoolean(R.bool.portrait_only)) {
             cG.setSelectionRequired(true);
             cG.setSingleSelection(true);
         }
@@ -178,7 +179,7 @@ public class ContentFragment extends Fragment {
         int color = requireContext().getColor(DataType.valueOfName(name).getColor());
         int[] colors = new int[]{
                 color,
-                ColorUtils.setAlphaComponent(color, 255 / 4)
+                ColorUtils.setAlphaComponent(color, 255 / 3)
         };
 
         allChip.setChipBackgroundColor(new ColorStateList(states, colors));
@@ -521,19 +522,56 @@ public class ContentFragment extends Fragment {
         //dataset
         List<Entry> data = getNumericData(dataName);
         sortData(data);
+        LineData lineData = new LineData();
+
         LineDataSet lineDataSet = new LineDataSet(data, dataName);
         DataType d = DataType.valueOfName(dataName);
         if (getResources().getBoolean(R.bool.portrait_only)) {
             lineDataSet.setColor(requireContext().getColor(R.color.primary));
 
+            float avg = 0;
+            for (Entry e: data
+                 ) {
+                avg+=e.getY();
+            }
+            avg= avg/data.size();
+            float newestY = data.get(data.size()-1).getY();
+            if(newestY>=avg*1.3f ||newestY<=avg*0.7f || newestY<d.getHealthyRange()[0] ||newestY>d.getHealthyRange()[1]){ //20% higher than average
+                lineDataSet.setColor(requireContext().getColor(R.color.error_dark));
+                Snackbar.make(requireContext(),getView(),"Dangerous trend detected!",Snackbar.LENGTH_INDEFINITE).setAction(
+                        "Acknowledge", view -> {}).setBackgroundTint(getContext().getColor(R.color.error_dark)).show();
+
+            }
+
+
+
+
+
+
+
+
+
         } else {
             lineDataSet.setColor(requireContext().getColor(d.getColor()));
         }
+        XAxis xAxis = chart.getXAxis();
+        YAxis yAxis = chart.getAxisLeft();
+        // draw limit lines behind data instead of on top
+        yAxis.setDrawLimitLinesBehindData(true);
+        xAxis.setDrawLimitLinesBehindData(true);
+
+
+        LimitLine[] limitLines = getLimitLines(d,"lower Limit","upper Limit",requireContext().getColor(d.getColor()));
+        yAxis.addLimitLine(limitLines[0]);
+        yAxis.addLimitLine(limitLines[1]);
+
+
         lineDataSet.setHighlightEnabled(true);
         lineDataSet.setLineWidth(3.0f);
         lineDataSet.setDrawValues(false);
         lineDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-        chart.setData(new LineData(lineDataSet));
+        lineData.addDataSet(lineDataSet);
+        chart.setData(lineData);
         chart.invalidate();
         chart.setMarker(new LineMarkerView(getContext(), R.layout.custom_marker,
                 requireContext().getColor(d.getColor())));
@@ -550,6 +588,24 @@ public class ContentFragment extends Fragment {
 
         charts.add(chart);
 
+    }
+
+    private LimitLine[] getLimitLines(DataType type, String lowerLabel, String upperLabel, int color){
+
+        LimitLine upperLimit= new LimitLine(type.getHealthyRange()[1], upperLabel);
+        upperLimit.setLineWidth(1f);
+        upperLimit.enableDashedLine(40f, 20f, 0f);
+        upperLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
+        upperLimit.setLineColor(color);
+
+
+        LimitLine lowerLimit = new LimitLine(type.getHealthyRange()[0], lowerLabel);
+        lowerLimit.setLineWidth(1f);
+        lowerLimit.enableDashedLine(40f, 20f, 0f);
+        lowerLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
+        lowerLimit.setLineColor(color);
+
+        return new LimitLine[]{lowerLimit,upperLimit};
     }
 
     private void genBloodPressureChart(String dataName) {
@@ -575,6 +631,48 @@ public class ContentFragment extends Fragment {
         lineDataSetSys.setLineWidth(3.0f);
         lineDataSetSys.setDrawValues(false);
         lineDataSetSys.setAxisDependency(YAxis.AxisDependency.LEFT);
+
+
+        if (getResources().getBoolean(R.bool.portrait_only)) {
+
+
+            float avg = 0;
+            for (Entry e : dataDia
+            ) {
+                avg += e.getY();
+            }
+            avg = avg / dataDia.size();
+            float newestY = dataDia.get(dataDia.size() - 1).getY();
+            if (newestY >= avg * 1.3f || newestY <= avg * 0.7f) { //20% higher than average
+                Snackbar.make(requireContext(), getView(), "Dangerous trend detected!",
+                        Snackbar.LENGTH_INDEFINITE).setAction(
+                        "Acknowledge", view -> {
+                        }).setBackgroundTint(getContext().getColor(R.color.error_dark)).show();
+            }
+
+
+
+
+        }
+
+        XAxis xAxis = chart.getXAxis();
+        YAxis yAxis = chart.getAxisLeft();
+        // draw limit lines behind data instead of on top
+        yAxis.setDrawLimitLinesBehindData(true);
+        xAxis.setDrawLimitLinesBehindData(true);
+
+
+        LimitLine[] limitLinesDia = getLimitLines(dDia,"Diastolic lower Limit","Diastolic upper Limit",requireContext().getColor(dDia.getColor()));
+        limitLinesDia[1].setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
+        yAxis.addLimitLine(limitLinesDia[0]);
+        yAxis.addLimitLine(limitLinesDia[1]);
+
+        LimitLine[] limitLinesSys = getLimitLines(dSys,"Systolic lower Limit","Systolic upper Limit",requireContext().getColor(dSys.getColor()));
+        limitLinesSys[0].setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
+        yAxis.addLimitLine(limitLinesSys[0]);
+        yAxis.addLimitLine(limitLinesSys[1]);
+
+
 
 
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
@@ -638,6 +736,7 @@ public class ContentFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        this.inflater = inflater;
         View view = inflater.inflate(R.layout.fragment_content, container, false);
 
         chartLayout = view.findViewById(R.id.content_chart_layout);
@@ -769,7 +868,34 @@ public class ContentFragment extends Fragment {
         if(getResources().getBoolean(R.bool.portrait_only)) {
             chipMap.get(getString(R.string.m_bloodsugar)).setChecked(true);
         }
+
+        for (Map.Entry<String, Chip> stringChipEntry : chipMap.entrySet()) {
+           String dataName = null;
+            if(stringChipEntry.getKey().equals(getString(R.string.bloodpressure))){
+                dataName = getString(R.string.m_bpdia);
+            }else {
+               dataName = stringChipEntry.getKey();
+            }
+            List<Entry> data = getNumericData(dataName);
+            float avg = 0;
+            Entry result = data.get(0);
+
+            for (int i=0;i<data.size();i++){
+                avg+=data.get(i).getY();
+                if(result.getX()<data.get(i).getX()){
+                    result = data.get(i);
+                }
+            }
+            avg = avg/data.size();
+            float[] healthyRange = DataType.valueOfName(dataName).getHealthyRange();
+            if(result.getY()<avg*0.7f || result.getY()>avg*1.3f || result.getY()<healthyRange[0] ||result.getY()>healthyRange[1]){
+                stringChipEntry.getValue().setChipIconVisible(true);
+            }
+        }
+
+
     }
+
 
     //interface for loading data with callback
     private void updateDataset(PatientWithData data) {

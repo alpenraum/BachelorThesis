@@ -159,25 +159,26 @@
             app:layout_constraintTop_toBottomOf="@+id/enter_data2_input_layout" />
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textinputlayout_date"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:textAlignment="textEnd"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="@+id/switch1"
             app:layout_constraintTop_toBottomOf="@+id/switch1"
-            android:textAlignment="textEnd">
-        <EditText
+            tools:visibility="visible">
 
-            android:id="@+id/editTextDate2"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:focusable="false"
-            android:inputType="date"
-            android:longClickable="false"
-            android:visibility="gone"
-            tools:visibility="visible"
-            android:hint="Date"
-            />
+            <EditText
+
+                android:id="@+id/editTextDate2"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:focusable="false"
+                android:hint="Date"
+                android:inputType="date"
+                android:longClickable="false" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

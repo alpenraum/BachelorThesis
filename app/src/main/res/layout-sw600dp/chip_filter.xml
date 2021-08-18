@@ -8,5 +8,7 @@
     android:checkable="true"
     android:clickable="true"
     android:focusable="true"
-    app:checkedIconVisible="true"
+    app:chipIcon="@drawable/ic_baseline_error_24"
+    app:chipIconTint="@color/error"
+    app:chipIconEnabled="false"
     tools:text="Easy" />
