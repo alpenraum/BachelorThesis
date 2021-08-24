@@ -1,7 +1,10 @@
 package com.example.bachelorthesis.persistence;
+
 import androidx.room.TypeConverter;
 
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 /**
  * @author Finn Zimmer
@@ -9,13 +12,20 @@ import java.util.Date;
 public class Converters {
 
     @TypeConverter
-    public static Date fromTimestamp(Long value) {
-        return value == null ? null : new Date(value);
+    public static LocalDate fromTimestamp(Long value) {
+        if(value!=null) {
+            return Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toLocalDate();
+        }
+        return null;
     }
 
     @TypeConverter
-    public static Long dateToTimestamp(Date date) {
-        return date == null ? null : date.getTime();
+    public static Long dateToTimestamp(LocalDate date) {
+
+        if (date != null) {
+            return date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        }
+        return null;
     }
 
 

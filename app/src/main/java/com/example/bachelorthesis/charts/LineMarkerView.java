@@ -17,6 +17,7 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.utils.MPPointF;
 
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 @SuppressLint("ViewConstructor")
@@ -32,7 +33,7 @@ public class LineMarkerView extends MarkerView {
 
     private final CardView rootView;
 
-    private final SimpleDateFormat mFormat = new SimpleDateFormat("dd.MM.yy",
+    private final DateTimeFormatter mFormat = DateTimeFormatter.ofPattern("dd.MM.yy",
             Locale.ENGLISH);
 
     private final int backgroundColor;

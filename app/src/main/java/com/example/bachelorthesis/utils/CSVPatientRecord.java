@@ -3,7 +3,9 @@ package com.example.bachelorthesis.utils;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * @author Finn Zimmer
@@ -14,8 +16,8 @@ public class CSVPatientRecord {
     private long patientNumber;
 
     @CsvBindByName(column = "CRETIME")
-    @CsvDate("yyyy-mm-dd")
-    private Date createdAt;
+    @CsvDate("yyyy-MM-dd")
+    private LocalDate createdAt;
 
     @CsvBindByName(column = "MCCOSITEM")
     private String type;
@@ -34,11 +36,11 @@ public class CSVPatientRecord {
         this.patientNumber = patientNumber;
     }
 
-    public Date getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 

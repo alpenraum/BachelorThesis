@@ -17,6 +17,7 @@ import com.example.bachelorthesis.utils.Concurrency;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -72,8 +73,8 @@ public class StartupActivity extends AppCompatActivity {
                     getAssets().open("08001363_Jane_Doe_1972-06-12.csv"));
 
             //manually add the user data since it is not saved somewhere accessible;
-            Patient patientPenz = new Patient("08001362", "Klaus Penz", new Date(1962, 6, 12));
-            Patient patientDoe = new Patient("08001363", "Jane Doe", new Date(1972, 6, 12));
+            Patient patientPenz = new Patient("08001362", "Klaus Penz", LocalDate.of(1962, 6, 12));
+            Patient patientDoe = new Patient("08001363", "Jane Doe", LocalDate.of(1972, 6, 12));
             AtomicLong idPenz = new AtomicLong();
             AtomicLong idDoe = new AtomicLong();
             Future<?> f = Concurrency.executeAsync(

@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.bachelorthesis.charts.LineMarkerView;
 import com.example.bachelorthesis.charts.SyncChartsListener;
+import com.example.bachelorthesis.persistence.Converters;
 import com.example.bachelorthesis.persistence.databases.AppDataBase;
 import com.example.bachelorthesis.persistence.entities.Patient;
 import com.example.bachelorthesis.persistence.entities.PatientDataRecord;
@@ -206,7 +207,7 @@ public class ContentFragment extends Fragment {
         for (PatientDataRecord p : patientWithData.patientDataRecords
         ) {
             if (dataType.contains(p.type)) {
-                Entry e = new Entry(p.timeStamp.getTime(), Float.parseFloat(p.value1));
+                Entry e = new Entry(Converters.dateToTimestamp(p.timeStamp), Float.parseFloat(p.value1));
                 e.setData(p);
                 result.add(e);
             }
@@ -220,7 +221,7 @@ public class ContentFragment extends Fragment {
 
         for (PatientDataRecord p : patientWithData.patientDataRecords) {
             if (dataName.contains(p.type)) {
-                Entry e = new Entry(p.timeStamp.getTime(), index);
+                Entry e = new Entry(Converters.dateToTimestamp(p.timeStamp), index);
                 e.setData(p);
                 result.add(e);
             }
@@ -854,16 +855,17 @@ public class ContentFragment extends Fragment {
 
         Log.d("Content-Fragment", "Working. Visualizing " + patient.name);
 
-        firstDataEntry = Collections.min(patientWithData.patientDataRecords,
+        firstDataEntry = Converters.dateToTimestamp(
+                Collections.min(patientWithData.patientDataRecords,
                 (entry, t1) -> { //entry < t1 == -1 / entry = t1 == 0
-                    if (entry.timeStamp.getTime() < t1.timeStamp.getTime()) {
+                    if (entry.timeStamp.isBefore(t1.timeStamp)) {
 
                         return -1;
-                    } else if (entry.timeStamp.getTime() == t1.timeStamp.getTime()) {
-                        return 0;
+                    } else if (entry.timeStamp.isAfter(t1.timeStamp)) {
+                        return 1;
                     }
-                    return 1;
-                }).timeStamp.getTime();
+                    return 0;
+                }).timeStamp);
 
         if(getResources().getBoolean(R.bool.portrait_only)) {
             chipMap.get(getString(R.string.m_bloodsugar)).setChecked(true);

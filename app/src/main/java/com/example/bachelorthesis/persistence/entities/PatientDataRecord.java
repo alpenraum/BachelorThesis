@@ -6,7 +6,9 @@ import androidx.room.PrimaryKey;
 
 import com.example.bachelorthesis.utils.CSVPatientRecord;
 
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * @author Finn Zimmer
@@ -24,14 +26,14 @@ public class PatientDataRecord {
     public String type;
 
     @ColumnInfo(name = "time_stamp")
-    public Date timeStamp;
+    public LocalDate timeStamp;
 
     public String value1;
 
     public String value2;
 
 
-    public PatientDataRecord(long patientId, String type, Date timeStamp,
+    public PatientDataRecord(long patientId, String type, LocalDate timeStamp,
                              String value1, String value2) {
         this.patientId = patientId;
         this.type = type;

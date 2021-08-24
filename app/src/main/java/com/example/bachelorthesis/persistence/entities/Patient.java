@@ -10,6 +10,8 @@ import androidx.room.PrimaryKey;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 
@@ -36,9 +38,9 @@ public class Patient implements Parcelable {
     @ColumnInfo(name = "patient_number")
     public String patientNumber;
     public String name;
-    public Date birthdate;
+    public LocalDate birthdate;
 
-    public Patient(String patientNumber, String name, Date birthdate) {
+    public Patient(String patientNumber, String name, LocalDate birthdate) {
         this.patientNumber = patientNumber;
         this.name = name;
         this.birthdate = birthdate;
@@ -48,14 +50,8 @@ public class Patient implements Parcelable {
         id = in.readLong();
         patientNumber = in.readString();
         name = in.readString();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-        try {
-            birthdate = formatter.parse(in.readString());
-        } catch (ParseException e) {
-            Log.e("Patient-Parcel",
-                    "Birthdate of " + name + " could not be read: " + e.getMessage());
-            birthdate = new Date();
-        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withLocale(Locale.ENGLISH);
+        birthdate = LocalDate.parse(in.readString(),formatter);
     }
 
     @Override

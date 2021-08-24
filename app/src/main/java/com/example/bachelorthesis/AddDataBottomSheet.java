@@ -34,6 +34,8 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -203,9 +205,9 @@ public class AddDataBottomSheet extends BottomSheetDialogFragment {
     private void saveData() {
         Concurrency.executeAsync(()-> {
             PatientDataDAO patientDataDAO = AppDataBase.getInstance(getContext()).patientDataDAO();
-            Date date = new Date(System.currentTimeMillis());
+            LocalDate date =LocalDate.now();
             if (!dateSwitch.isChecked()) {
-                date = calendar.getTime();
+                date = LocalDateTime.ofInstant(calendar.toInstant(), calendar.getTimeZone().toZoneId()).toLocalDate();
             }
             if (chosenType.equals(getString(R.string.bloodpressure))) {
                 PatientDataRecord dataRecordSys = new PatientDataRecord(patientId,
