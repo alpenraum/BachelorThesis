@@ -1,7 +1,9 @@
 package com.example.bachelorthesis;
 
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -14,6 +16,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +29,8 @@ import com.example.bachelorthesis.persistence.databases.AppDataBase;
 import com.example.bachelorthesis.persistence.entities.PatientDataRecord;
 import com.example.bachelorthesis.utils.Concurrency;
 import com.example.bachelorthesis.utils.ReloadDataCallback;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -37,7 +42,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author Finn Zimmer
@@ -55,24 +60,41 @@ public class AddDataBottomSheet extends BottomSheetDialogFragment {
     private TextInputEditText data2;
 
     private SwitchMaterial dateSwitch;
+    private boolean tabletMode = false;
+
+    private String selectedMeasurement;
 
     private ReloadDataCallback reloadDataCallback = null;
+
     public AddDataBottomSheet() {
         super();
         measurements = new String[0];
         patientId = -1;
     }
 
-    public AddDataBottomSheet(String[] measurements, long patientId, ReloadDataCallback reloadDataCallback) {
+    public AddDataBottomSheet(String[] measurements, long patientId,
+                              ReloadDataCallback reloadDataCallback) {
         super();
         this.patientId = patientId;
         this.measurements = measurements;
         this.reloadDataCallback = reloadDataCallback;
+        tabletMode = false;
+    }
+
+    public AddDataBottomSheet(String measurement, long patientId,
+                              ReloadDataCallback reloadDataCallback) {
+        super();
+        this.patientId = patientId;
+        this.measurements = new String[]{};
+        this.reloadDataCallback = reloadDataCallback;
+        tabletMode = true;
+        this.selectedMeasurement = measurement;
     }
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.add_data_bottom_sheet, container, false);
 
         //cancel button
@@ -82,35 +104,39 @@ public class AddDataBottomSheet extends BottomSheetDialogFragment {
         data1 = view.findViewById(R.id.enter_data1_edit_text);
         data2 = view.findViewById(R.id.enter_data2_edit_text);
 
-        adapter = new ArrayAdapter<String>(getContext(),
-                R.layout.support_simple_spinner_dropdown_item, measurements);
+
+        if (!tabletMode) {
+            adapter = new ArrayAdapter<String>(getContext(),
+                    R.layout.support_simple_spinner_dropdown_item, measurements);
 
 
-        AutoCompleteTextView aCT = view.findViewById(R.id.autoCompleteTextView);
-        aCT.setAdapter(adapter);
-        aCT.setThreshold(1);
-        aCT.setOnEditorActionListener((v, actionId, event) -> {
+            AutoCompleteTextView aCT = view.findViewById(R.id.autoCompleteTextView);
+            aCT.setAdapter(adapter);
+            aCT.setThreshold(1);
+            aCT.setOnEditorActionListener((v, actionId, event) -> {
 
-            if (actionId == KeyEvent.ACTION_DOWN) {
-                if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                    closeKeyBoard();
-                    return true;
+                if (actionId == KeyEvent.ACTION_DOWN) {
+                    if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                        closeKeyBoard();
+                        return true;
+                    }
                 }
-            }
-            return false;
-        });
+                return false;
+            });
 
-        aCT.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view1, int position, long id) {
-                chosenType = adapter.getItem(position).toString();
-                closeKeyBoard(view);
-                measurementSelected(view, chosenType);
+            aCT.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view1, int position, long id) {
+                    chosenType = adapter.getItem(position).toString();
+                    closeKeyBoard(view);
+                    measurementSelected(view, chosenType);
 
 
-            }
-        });
-
+                }
+            });
+        } else {
+            measurementSelected(view, selectedMeasurement);
+        }
         EditText dateView = view.findViewById(R.id.editTextDate2);
         DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
 
@@ -173,7 +199,8 @@ public class AddDataBottomSheet extends BottomSheetDialogFragment {
             closeKeyBoard(view);
         }
     }
-    private void closeKeyBoard(View view){
+
+    private void closeKeyBoard(View view) {
         InputMethodManager imm = (InputMethodManager)
                 requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
@@ -203,30 +230,32 @@ public class AddDataBottomSheet extends BottomSheetDialogFragment {
     }
 
     private void saveData() {
-        Concurrency.executeAsync(()-> {
+        Concurrency.executeAsync(() -> {
             PatientDataDAO patientDataDAO = AppDataBase.getInstance(getContext()).patientDataDAO();
-            LocalDate date =LocalDate.now();
+            LocalDate date = LocalDate.now();
             if (!dateSwitch.isChecked()) {
-                date = LocalDateTime.ofInstant(calendar.toInstant(), calendar.getTimeZone().toZoneId()).toLocalDate();
+                date = LocalDateTime.ofInstant(calendar.toInstant(),
+                        calendar.getTimeZone().toZoneId()).toLocalDate();
             }
             if (chosenType.equals(getString(R.string.bloodpressure))) {
                 PatientDataRecord dataRecordSys = new PatientDataRecord(patientId,
                         getString(R.string.m_bpsys),
-                        date, data1.getText().toString(), "");
+                        date, Objects.requireNonNull(data1.getText()).toString(), "");
                 PatientDataRecord dataRecordDia = new PatientDataRecord(patientId,
                         getString(R.string.m_bpdia),
-                        date, data2.getText().toString(), "");
+                        date, Objects.requireNonNull(data2.getText()).toString(), "");
 
                 patientDataDAO.insertPatientDataRecords(dataRecordSys, dataRecordDia);
             } else {
                 PatientDataRecord dataRecord = new PatientDataRecord(patientId, chosenType,
-                        date, data1.getText().toString(), data2.getText().toString());
+                        date, Objects.requireNonNull(data1.getText())
+                        .toString(), Objects.requireNonNull(data2.getText()).toString());
 
                 patientDataDAO.insertPatientDataRecord(dataRecord);
             }
             this.close();
 
         });
-        Toast.makeText(getContext(),"Measurement Saved!",Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Measurement Saved!", Toast.LENGTH_SHORT).show();
     }
 }

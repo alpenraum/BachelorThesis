@@ -82,8 +82,8 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
         if (getResources().getBoolean(R.bool.portrait_only)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
 
-            ExtendedFloatingActionButton addData = findViewById(R.id.add_data_fab);
-            addData.setOnClickListener((view)-> showAddDataFragment());
+            ExtendedFloatingActionButton addData = findViewById(R.id.linechart_add_data_fab);
+            addData.setOnClickListener((view) -> showAddDataFragment());
 
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
@@ -175,21 +175,21 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
             scanButton.setOnClickListener(this::startScanner);
 
         }
-        if(getResources().getBoolean(R.bool.portrait_only)) {
+        if (getResources().getBoolean(R.bool.portrait_only)) {
             Single<Patient> patient =
                     AppDataBase.getInstance(this).patientDAO().findPatientByPatientNumber(
                             "08001362");
 
+            //noinspection ResultOfMethodCallIgnored
             patient.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::handleUserFlowable, throwable -> {
-                        Log.e("User Loading", "Error while loading the current user!");
-                    });
+                    .subscribe(this::handleUserFlowable, throwable -> Log.e("User Loading",
+                            "Error while loading the current user!"));
         }
     }
 
 
-    private void showAddDataFragment(){
-        String[] measurements = new String[] {
+    private void showAddDataFragment() {
+        String[] measurements = new String[]{
                 getString(R.string.m_bloodsugar),
                 getString(R.string.m_bmi),
                 getString(R.string.m_bodyweight),
@@ -198,16 +198,16 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
                 getString(R.string.m_triglyceride),
                 getString(R.string.m_creatinin)
         };
-        AddDataBottomSheet sheet = new AddDataBottomSheet(measurements, this.user.id,this::reloadData);
-        sheet.show(getSupportFragmentManager(),"addDataBottomSheet");
+        AddDataBottomSheet sheet = new AddDataBottomSheet(measurements, this.user.id,
+                this::reloadData);
+        sheet.show(getSupportFragmentManager(), "addDataBottomSheet");
 
 
     }
 
-    private void reloadData(){
+    private void reloadData() {
         showPatientData(user);
     }
-
 
 
     private void handleUserFlowable(Patient patient) {
@@ -225,7 +225,8 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode,
+                data);
         // if the intentResult is null then
         // toast a message as "cancelled"
         if (intentResult != null) {
@@ -257,7 +258,8 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
             }
             patientListAdapter.clickAndScrollToPosition(position);
 
-            Toast.makeText(getBaseContext(), "Patient scanned succesfully!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getBaseContext(), "Patient scanned successfully!", Toast.LENGTH_SHORT)
+                    .show();
         } catch (NoSuchElementException e) {
             Toast.makeText(getBaseContext(), "This QR-Code does not belong to any patient!",
                     Toast.LENGTH_SHORT).show();
@@ -282,7 +284,8 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
             List<Patient> filteredResults =
                     results.stream().filter(patient ->
                             patient.patientNumber
-                                    .toLowerCase(Locale.ROOT).contains(stringInput.toLowerCase(Locale.ROOT)))
+                                    .toLowerCase(Locale.ROOT)
+                                    .contains(stringInput.toLowerCase(Locale.ROOT)))
                             .collect(Collectors.toList());
 
             updatePatientList(filteredResults);
@@ -292,7 +295,8 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
             List<Patient> filteredResults =
                     results.stream().filter(patient ->
                             patient.name
-                                    .toLowerCase(Locale.ROOT).contains(stringInput.toLowerCase(Locale.ROOT)))
+                                    .toLowerCase(Locale.ROOT)
+                                    .contains(stringInput.toLowerCase(Locale.ROOT)))
                             .collect(Collectors.toList());
 
             updatePatientList(filteredResults);
@@ -321,12 +325,13 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
                     AppDataBase.getInstance(this).patientDAO().getAllPatients();
 
             mDisposable.add(patientFlowable.subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::updatePatientList, throwable -> Log.e("MainActivity", "Unable to" +
-                                    " get " +
-                                    "patients",
-                            throwable))
-            );
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(this::updatePatientList,
+                                    throwable -> Log.e("MainActivity", "Unable to" +
+                                                    " get " +
+                                                    "patients",
+                                            throwable))
+                           );
         }
 
     }
@@ -350,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
 
     @SuppressLint("NotifyDataSetChanged")
     private void updatePatientList(List<Patient> patients) {
-        Log.d("Main Activity", "RECYLERVIEW UPDATED");
+        Log.d("Main Activity", "RECYCLERVIEW UPDATED");
         patientListAdapter.updateData(patients);
         patientListAdapter.notifyDataSetChanged();
     }

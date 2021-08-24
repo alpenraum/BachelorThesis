@@ -3,12 +3,16 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/drawable/background.xml" value="0.3828125" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/drawable/circle.xml" value="0.3828125" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/drawable/ic_round_drag_handle_24.xml" value="0.3828125" />
+        <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout-sw600dp/activity_main.xml" value="0.275" />
+        <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout-sw600dp/add_data_bottom_sheet.xml" value="0.275" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout-sw600dp/chip_filter.xml" value="1.0" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout-sw600dp/fragment_content.xml" value="0.275" />
-        <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout-sw600dp/linechart_layout.xml" value="0.275" />
+        <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout-sw600dp/linechart_layout.xml" value="0.41025641025641024" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout-sw600dp/trend_notification.xml" value="0.6875" />
+        <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout/activity_main.xml" value="0.3378623188405797" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout/add_data_bottom_sheet.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout/chip_filter.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Finn/StudioProjects/BachelorThesis/app/src/main/res/layout/custom_marker.xml" value="0.2749094202898551" />
@@ -20,7 +24,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_X" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

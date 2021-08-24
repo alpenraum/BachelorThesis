@@ -28,5 +28,6 @@
     <color name="data_dia">#53F0CD</color>
     <color name="data_triglyceride">#A4F137</color>
     <color name="data_bloodpressure">#21DEE5</color>
+    <color name="transparent">#00FFFFFF</color>
 
 </resources>

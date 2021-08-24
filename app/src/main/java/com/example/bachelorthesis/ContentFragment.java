@@ -3,7 +3,6 @@ package com.example.bachelorthesis;
 import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,8 +38,10 @@ import com.github.mikephil.charting.data.ScatterDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.jmedeisis.draglinearlayout.DragLinearLayout;
 import com.leinardi.android.speeddial.SpeedDialView;
@@ -84,8 +85,6 @@ public class ContentFragment extends Fragment {
     private final OnDataLoadedCallback onDataLoadedCallback = this::updateDataset;
     private DragLinearLayout chartLayout;
     private Long firstDataEntry = 0L;
-
-    private LayoutInflater inflater;
 
 
     public ContentFragment() {
@@ -274,8 +273,8 @@ public class ContentFragment extends Fragment {
             ((CardView) chartLayoutView.findViewById(R.id.line_cardview))
                     .setCardBackgroundColor(requireContext().getColor(d.getColor()));
             int textColor = CustomColorUtils.isBrightColor(d.getColor()) ?
-                    getContext().getColor(R.color.black) :
-                    getContext().getColor(R.color.white);
+                    requireContext().getColor(R.color.black) :
+                    requireContext().getColor(R.color.white);
 
             ((TextView) chartLayoutView.findViewById(R.id.chart_title)).setTextColor(textColor);
         } else {
@@ -339,6 +338,13 @@ public class ContentFragment extends Fragment {
         //text formatting size
         leftAxis.setTextSize(12.0f);
         xAxis.setTextSize(12.0f);
+
+        //Set the add-data FAB
+        if(!getResources().getBoolean(R.bool.portrait_only)) {
+            FloatingActionButton fab = chartLayoutView.findViewById(R.id.linechart_add_data_fab);
+            fab.setOnClickListener((view -> this.showAddDataDialog(dataName)));
+        }
+
 
         chartViewMap.put(dataName, chartLayoutView);
         addViewToDragLinearLayout(chartLayoutView, chartLayout);
@@ -413,8 +419,6 @@ public class ContentFragment extends Fragment {
         xAxis.setTextSize(12.0f);
 
         chartViewMap.put(dataName, chartLayoutView);
-
-
         addViewToDragLinearLayout(chartLayoutView, chartLayout);
         return chart;
     }
@@ -426,6 +430,7 @@ public class ContentFragment extends Fragment {
         }
     }
 
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     private void genTreatmentScatterChart(String dataName) {
         ScatterChart chart = createScatterChart(dataName);
 
@@ -471,6 +476,7 @@ public class ContentFragment extends Fragment {
         charts.add(chart);
     }
 
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     private void genRiskScatterChart(String dataName) {
         ScatterChart chart = createScatterChart(dataName);
 
@@ -539,8 +545,9 @@ public class ContentFragment extends Fragment {
             float newestY = data.get(data.size()-1).getY();
             if(newestY>=avg*1.3f ||newestY<=avg*0.7f || newestY<d.getHealthyRange()[0] ||newestY>d.getHealthyRange()[1]){ //20% higher than average
                 lineDataSet.setColor(requireContext().getColor(R.color.error_dark));
-                Snackbar.make(requireContext(),getView(),"Dangerous trend detected!",Snackbar.LENGTH_INDEFINITE).setAction(
-                        "Acknowledge", view -> {}).setBackgroundTint(getContext().getColor(R.color.error_dark)).show();
+                Snackbar.make(requireContext(), requireView(),"Dangerous trend detected!",Snackbar.LENGTH_INDEFINITE).setAction(
+                        "Acknowledge", view -> {}).setBackgroundTint(
+                        requireContext().getColor(R.color.error_dark)).show();
 
             }
 
@@ -645,10 +652,11 @@ public class ContentFragment extends Fragment {
             avg = avg / dataDia.size();
             float newestY = dataDia.get(dataDia.size() - 1).getY();
             if (newestY >= avg * 1.3f || newestY <= avg * 0.7f) { //20% higher than average
-                Snackbar.make(requireContext(), getView(), "Dangerous trend detected!",
+                Snackbar.make(requireContext(), requireView(), "Dangerous trend detected!",
                         Snackbar.LENGTH_INDEFINITE).setAction(
                         "Acknowledge", view -> {
-                        }).setBackgroundTint(getContext().getColor(R.color.error_dark)).show();
+                        }).setBackgroundTint(
+                        requireContext().getColor(R.color.error_dark)).show();
             }
 
 
@@ -737,7 +745,6 @@ public class ContentFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        this.inflater = inflater;
         View view = inflater.inflate(R.layout.fragment_content, container, false);
 
         chartLayout = view.findViewById(R.id.content_chart_layout);
@@ -868,11 +875,11 @@ public class ContentFragment extends Fragment {
                 }).timeStamp);
 
         if(getResources().getBoolean(R.bool.portrait_only)) {
-            chipMap.get(getString(R.string.m_bloodsugar)).setChecked(true);
+            Objects.requireNonNull(chipMap.get(getString(R.string.m_bloodsugar))).setChecked(true);
         }
 
         for (Map.Entry<String, Chip> stringChipEntry : chipMap.entrySet()) {
-           String dataName = null;
+           String dataName;
             if(stringChipEntry.getKey().equals(getString(R.string.bloodpressure))){
                 dataName = getString(R.string.m_bpdia);
             }else {
@@ -908,5 +915,15 @@ public class ContentFragment extends Fragment {
     private interface OnDataLoadedCallback {
         void onDataLoaded(PatientWithData data);
     }
+
+
+
+    private void showAddDataDialog(String dataName){
+        AddDataBottomSheet sheet = new AddDataBottomSheet(dataName, patient.id,
+               ()->{});
+        sheet.show(getParentFragmentManager(), "addDataBottomSheet");
+        Log.d("FRAGMENT CONTENT","SHOW ADD DATA DIALOG");
+    }
+
 
 }
