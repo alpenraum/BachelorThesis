@@ -1,12 +1,12 @@
 package com.example.bachelorthesis;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.bachelorthesis.persistence.databases.AppDataBase;
 import com.example.bachelorthesis.persistence.entities.Patient;
@@ -19,7 +19,6 @@ import com.google.android.material.snackbar.Snackbar;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
@@ -37,7 +36,7 @@ public class StartupActivity extends AppCompatActivity {
                         Context.MODE_PRIVATE);
 
         if (!sP.getBoolean(INIT_LOC, true)) {
-            Log.d("STARTUP","Not first launch. Skipping loading data.");
+            Log.d("STARTUP", "Not first launch. Skipping loading data.");
             Intent i = new Intent(this, MainActivity.class);
             startActivity(i);
             finish();
@@ -99,10 +98,11 @@ public class StartupActivity extends AppCompatActivity {
 
             //Ugly Anti-Pattern. I do not want to over-engineer the data loading for a proof of concept
             while (!f.isDone()) {
-                Log.d("Loading Data","Waiting on Thread Completion...");
+                Log.d("Loading Data", "Waiting on Thread Completion...");
             }
 
-            Log.d("Loading Data", "Completion took "+(System.currentTimeMillis()-time)/1000.0f+" seconds.");
+            Log.d("Loading Data",
+                    "Completion took " + (System.currentTimeMillis() - time) / 1000.0f + " seconds.");
 
 
         } catch (IOException e) {

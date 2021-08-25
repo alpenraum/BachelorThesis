@@ -13,7 +13,7 @@ public class Converters {
 
     @TypeConverter
     public static LocalDate fromTimestamp(Long value) {
-        if(value!=null) {
+        if (value != null) {
             return Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toLocalDate();
         }
         return null;

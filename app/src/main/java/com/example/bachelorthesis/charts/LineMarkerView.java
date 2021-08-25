@@ -2,7 +2,6 @@ package com.example.bachelorthesis.charts;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
@@ -16,7 +15,6 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.utils.MPPointF;
 
-import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -39,14 +37,16 @@ public class LineMarkerView extends MarkerView {
     private final int backgroundColor;
     private final int textColor;
 
+
+    //to position it correctly, even if the selected data-point is right at the edge
     private boolean nearRightBorder = false;
-    private boolean nearLeftBorder =false;
+    private boolean nearLeftBorder = false;
 
 
     /**
      * Constructor. Sets up the MarkerView with a custom layout resource.
      *
-     * @param context The current Context
+     * @param context        The current Context
      * @param layoutResource the layout resource to use for the MarkerView
      */
     public LineMarkerView(Context context, int layoutResource, int backgroundColor) {
@@ -60,9 +60,9 @@ public class LineMarkerView extends MarkerView {
         label_value2 = findViewById(R.id.label_marker_value2);
 
         rootView = findViewById(R.id.marker_root);
-        this.backgroundColor = ColorUtils.setAlphaComponent(backgroundColor,127);
-        this.textColor = CustomColorUtils.isBrightColor(backgroundColor)?
-                getContext().getColor(R.color.black):
+        this.backgroundColor = ColorUtils.setAlphaComponent(backgroundColor, 127);
+        this.textColor = CustomColorUtils.isBrightColor(backgroundColor) ?
+                getContext().getColor(R.color.black) :
                 getContext().getColor(R.color.white);
 
 
@@ -73,7 +73,7 @@ public class LineMarkerView extends MarkerView {
         nearRightBorder = false;
         nearLeftBorder = false;
 
-        if(e.getData()!=null){
+        if (e.getData() != null) {
             PatientDataRecord p = (PatientDataRecord) e.getData();
 
             value1.setText(p.value1);
@@ -88,9 +88,9 @@ public class LineMarkerView extends MarkerView {
             date.setTextColor((textColor));
         }
 
-        if(highlight.getXPx()>=700.0f){
+        if (highlight.getXPx() >= 700.0f) {
             nearRightBorder = true;
-        }else if(highlight.getXPx()<=100.0f){
+        } else if (highlight.getXPx() <= 100.0f) {
             nearLeftBorder = true;
         }
 
@@ -102,11 +102,11 @@ public class LineMarkerView extends MarkerView {
 
     @Override
     public MPPointF getOffset() {
-        MPPointF pointF =new MPPointF(-(getWidth() / 2.0f), -getHeight());
-        if(nearRightBorder){
-            pointF.x =-getWidth();
+        MPPointF pointF = new MPPointF(-(getWidth() / 2.0f), -getHeight());
+        if (nearRightBorder) {
+            pointF.x = -getWidth();
         }
-        if(nearLeftBorder){
+        if (nearLeftBorder) {
             pointF.x = 0;
         }
         return pointF;

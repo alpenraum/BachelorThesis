@@ -7,8 +7,6 @@ import androidx.room.PrimaryKey;
 import com.example.bachelorthesis.utils.CSVPatientRecord;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * @author Finn Zimmer

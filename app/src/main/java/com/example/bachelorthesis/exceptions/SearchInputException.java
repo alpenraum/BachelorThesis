@@ -8,7 +8,7 @@ import java.io.IOException;
 public class SearchInputException extends IOException {
     private final Type type;
 
-    public SearchInputException(String message, Type type){
+    public SearchInputException(String message, Type type) {
         super(message);
         this.type = type;
     }
@@ -17,7 +17,7 @@ public class SearchInputException extends IOException {
         return type;
     }
 
-    public enum Type{
+    public enum Type {
         NAME,
         NUMBER
     }

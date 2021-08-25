@@ -12,17 +12,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.bachelorthesis.R;
 import com.example.bachelorthesis.persistence.entities.Patient;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.ViewHolder> {
 
     private final List<Patient> localDataSet;
-    private int adapterPosition = -1;
-
     private final RecyclerView.LayoutManager layoutManager;
-
     private final PatientVisualizationCallback visualizationCallback;
+    private int adapterPosition = -1;
 
     public PatientListAdapter(List<Patient> localDataSet, PatientVisualizationCallback callback,
                               RecyclerView.LayoutManager layoutManager) {
@@ -46,10 +43,6 @@ public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.
 
         return new ViewHolder(view);
 
-    }
-
-    public List<Patient> getLocalDataSet() {
-        return new ArrayList<>(localDataSet);
     }
 
     @Override
@@ -96,7 +89,7 @@ public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.
 
     }
 
-    public int getPosition(String patientNUmber){
+    public int getPosition(String patientNUmber) {
         for (int i = 0; i < localDataSet.size(); i++) {
             Patient p = localDataSet.get(i);
             if (p.patientNumber.equals(patientNUmber)) {

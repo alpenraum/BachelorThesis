@@ -1,22 +1,16 @@
 package com.example.bachelorthesis;
 
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.CompoundButton;
-import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,8 +23,6 @@ import com.example.bachelorthesis.persistence.databases.AppDataBase;
 import com.example.bachelorthesis.persistence.entities.PatientDataRecord;
 import com.example.bachelorthesis.utils.Concurrency;
 import com.example.bachelorthesis.utils.ReloadDataCallback;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -47,7 +39,6 @@ import java.util.Objects;
 /**
  * @author Finn Zimmer
  */
-//TODO: TESTING
 public class AddDataBottomSheet extends BottomSheetDialogFragment {
 
     private final String[] measurements;
@@ -60,6 +51,7 @@ public class AddDataBottomSheet extends BottomSheetDialogFragment {
     private TextInputEditText data2;
 
     private SwitchMaterial dateSwitch;
+
     private boolean tabletMode = false;
 
     private String selectedMeasurement;
@@ -72,6 +64,14 @@ public class AddDataBottomSheet extends BottomSheetDialogFragment {
         patientId = -1;
     }
 
+    /**
+     * Constructor for use with mobile mode
+     *
+     * @param measurements       the list of measurements of which the user decides
+     *                           which measurement type to add
+     * @param patientId          the id of the patient
+     * @param reloadDataCallback Callback to reload the data after the data was inserted
+     */
     public AddDataBottomSheet(String[] measurements, long patientId,
                               ReloadDataCallback reloadDataCallback) {
         super();
@@ -81,6 +81,13 @@ public class AddDataBottomSheet extends BottomSheetDialogFragment {
         tabletMode = false;
     }
 
+    /**
+     * Constructor for use with tablet mode
+     *
+     * @param measurement        the measurement to which the entry will be added
+     * @param patientId          the id of the patient
+     * @param reloadDataCallback Callback to reload the data after the data was inserted
+     */
     public AddDataBottomSheet(String measurement, long patientId,
                               ReloadDataCallback reloadDataCallback) {
         super();
@@ -106,7 +113,7 @@ public class AddDataBottomSheet extends BottomSheetDialogFragment {
 
 
         if (!tabletMode) {
-            adapter = new ArrayAdapter<String>(getContext(),
+            adapter = new ArrayAdapter<>(getContext(),
                     R.layout.support_simple_spinner_dropdown_item, measurements);
 
 
@@ -124,63 +131,44 @@ public class AddDataBottomSheet extends BottomSheetDialogFragment {
                 return false;
             });
 
-            aCT.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view1, int position, long id) {
-                    chosenType = adapter.getItem(position).toString();
-                    closeKeyBoard(view);
-                    measurementSelected(view, chosenType);
+            aCT.setOnItemClickListener((parent, view1, position, id) -> {
+                chosenType = adapter.getItem(position);
+                closeKeyBoard(view);
+                measurementSelected(view, chosenType);
 
 
-                }
             });
         } else {
             measurementSelected(view, selectedMeasurement);
         }
         EditText dateView = view.findViewById(R.id.editTextDate2);
-        DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+        DatePickerDialog.OnDateSetListener date = (view12, year, monthOfYear, dayOfMonth) -> {
 
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear,
-                                  int dayOfMonth) {
+            calendar.set(Calendar.YEAR, year);
+            calendar.set(Calendar.MONTH, monthOfYear);
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-                calendar.set(Calendar.YEAR, year);
-                calendar.set(Calendar.MONTH, monthOfYear);
-                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
-                DateFormat df = SimpleDateFormat.getDateInstance();
-                dateView.setText(df.format(calendar.getTime()));
-
-            }
+            DateFormat df = SimpleDateFormat.getDateInstance();
+            dateView.setText(df.format(calendar.getTime()));
 
         };
 
-        dateView.setOnClickListener((View v) -> {
-            new DatePickerDialog(getContext(), date, calendar
-                    .get(Calendar.YEAR), calendar.get(Calendar.MONTH),
-                    calendar.get(Calendar.DAY_OF_MONTH)).show();
-        });
+        dateView.setOnClickListener((View v) -> new DatePickerDialog(getContext(), date, calendar
+                .get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)).show());
 
 
         dateSwitch = view.findViewById(R.id.switch1);
-        dateSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    view.findViewById(R.id.textinputlayout_date).setVisibility(View.GONE);
-                } else {
-                    view.findViewById(R.id.textinputlayout_date).setVisibility(View.VISIBLE);
-                }
+        dateSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                view.findViewById(R.id.textinputlayout_date).setVisibility(View.GONE);
+            } else {
+                view.findViewById(R.id.textinputlayout_date).setVisibility(View.VISIBLE);
             }
         });
 
         ExtendedFloatingActionButton saveFab = view.findViewById(R.id.save_data_fab);
-        saveFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveData();
-            }
-        });
+        saveFab.setOnClickListener(v -> saveData());
 
 
         return view;
@@ -206,6 +194,12 @@ public class AddDataBottomSheet extends BottomSheetDialogFragment {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
+    /**
+     * Makes the rest of the input modal visible and updates the text to correspond to the selected measurement
+     *
+     * @param parentView Root view of this AddDataBottomSheet
+     * @param measurement the selected measurement
+     */
     private void measurementSelected(View parentView, String measurement) {
 
         ConstraintLayout layout =
