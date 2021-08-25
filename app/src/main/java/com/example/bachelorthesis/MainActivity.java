@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements PatientVisualizat
         if (getResources().getBoolean(R.bool.portrait_only)) {
             Single<Patient> patient =
                     AppDataBase.getInstance(this).patientDAO().findPatientByPatientNumber(
-                            "08001362");
+                            "08001363");
 
             //noinspection ResultOfMethodCallIgnored
             patient.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())

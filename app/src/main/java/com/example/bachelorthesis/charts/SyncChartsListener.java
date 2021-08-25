@@ -8,6 +8,9 @@ import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
 
+/**
+ * Syncs the charts to show the same viewport. Can be called manually, but also triggers when moving or scaling one chart
+ */
 public class SyncChartsListener implements OnChartGestureListener {
 
     private final Chart<?> sourceChart;
@@ -16,6 +19,28 @@ public class SyncChartsListener implements OnChartGestureListener {
     public SyncChartsListener(Chart<?> sourceChart, ContentFragment contentFragment) {
         this.sourceChart = sourceChart;
         this.contentFragment = contentFragment;
+    }
+
+    public static void syncCharts(Chart<?> mainChart, Chart<?>[] otherCharts) {
+        Matrix mainMatrix;
+        float[] mainVals = new float[9];
+        Matrix otherMatrix;
+        float[] otherVals = new float[9];
+        mainMatrix = mainChart.getViewPortHandler().getMatrixTouch();
+        mainMatrix.getValues(mainVals);
+
+
+        for (Chart<?> tempChart : otherCharts) {
+
+            otherMatrix = tempChart.getViewPortHandler().getMatrixTouch();
+            otherMatrix.getValues(otherVals);
+            otherVals[Matrix.MSCALE_X] = mainVals[Matrix.MSCALE_X];
+            otherVals[Matrix.MTRANS_X] = mainVals[Matrix.MTRANS_X];
+            otherVals[Matrix.MSKEW_X] = mainVals[Matrix.MSKEW_X];
+            otherMatrix.setValues(otherVals);
+            tempChart.getViewPortHandler().refresh(otherMatrix, tempChart, true);
+
+        }
     }
 
     @Override
@@ -58,27 +83,5 @@ public class SyncChartsListener implements OnChartGestureListener {
     @Override
     public void onChartTranslate(MotionEvent me, float dX, float dY) {
         syncCharts(sourceChart, contentFragment.getOtherCharts(sourceChart));
-    }
-
-    public static void syncCharts(Chart<?> mainChart, Chart<?>[] otherCharts) {
-        Matrix mainMatrix;
-        float[] mainVals = new float[9];
-        Matrix otherMatrix;
-        float[] otherVals = new float[9];
-        mainMatrix = mainChart.getViewPortHandler().getMatrixTouch();
-        mainMatrix.getValues(mainVals);
-
-
-        for (Chart<?> tempChart : otherCharts) {
-
-            otherMatrix = tempChart.getViewPortHandler().getMatrixTouch();
-            otherMatrix.getValues(otherVals);
-            otherVals[Matrix.MSCALE_X] = mainVals[Matrix.MSCALE_X];
-            otherVals[Matrix.MTRANS_X] = mainVals[Matrix.MTRANS_X];
-            otherVals[Matrix.MSKEW_X] = mainVals[Matrix.MSKEW_X];
-            otherMatrix.setValues(otherVals);
-            tempChart.getViewPortHandler().refresh(otherMatrix, tempChart, true);
-
-        }
     }
 }

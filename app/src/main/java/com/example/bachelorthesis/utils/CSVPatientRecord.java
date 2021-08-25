@@ -4,8 +4,6 @@ import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * @author Finn Zimmer

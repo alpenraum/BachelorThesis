@@ -2,17 +2,13 @@ package com.example.bachelorthesis.persistence.entities;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -33,11 +29,14 @@ public class Patient implements Parcelable {
     };
     @PrimaryKey(autoGenerate = true)
     public long id;
+
     /*I do not like this but inserting the specified id into the
     / auto-increment field screams problems*/
     @ColumnInfo(name = "patient_number")
     public String patientNumber;
+
     public String name;
+
     public LocalDate birthdate;
 
     public Patient(String patientNumber, String name, LocalDate birthdate) {
@@ -50,8 +49,9 @@ public class Patient implements Parcelable {
         id = in.readLong();
         patientNumber = in.readString();
         name = in.readString();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withLocale(Locale.ENGLISH);
-        birthdate = LocalDate.parse(in.readString(),formatter);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                .withLocale(Locale.ENGLISH);
+        birthdate = LocalDate.parse(in.readString(), formatter);
     }
 
     @Override

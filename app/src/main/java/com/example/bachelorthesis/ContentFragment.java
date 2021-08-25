@@ -38,7 +38,6 @@ import com.github.mikephil.charting.data.ScatterDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -206,7 +205,8 @@ public class ContentFragment extends Fragment {
         for (PatientDataRecord p : patientWithData.patientDataRecords
         ) {
             if (dataType.contains(p.type)) {
-                Entry e = new Entry(Converters.dateToTimestamp(p.timeStamp), Float.parseFloat(p.value1));
+                Entry e = new Entry(Converters.dateToTimestamp(p.timeStamp),
+                        Float.parseFloat(p.value1));
                 e.setData(p);
                 result.add(e);
             }
@@ -340,7 +340,7 @@ public class ContentFragment extends Fragment {
         xAxis.setTextSize(12.0f);
 
         //Set the add-data FAB
-        if(!getResources().getBoolean(R.bool.portrait_only)) {
+        if (!getResources().getBoolean(R.bool.portrait_only)) {
             FloatingActionButton fab = chartLayoutView.findViewById(R.id.linechart_add_data_fab);
             fab.setOnClickListener((view -> this.showAddDataDialog(dataName)));
         }
@@ -352,6 +352,7 @@ public class ContentFragment extends Fragment {
         return chart;
     }
 
+    @Deprecated
     private ScatterChart createScatterChart(String dataName) {
         View chartLayoutView = getLayoutInflater().inflate(R.layout.scatterchart_layout,
                 chartLayout,
@@ -430,6 +431,7 @@ public class ContentFragment extends Fragment {
         }
     }
 
+    @Deprecated
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     private void genTreatmentScatterChart(String dataName) {
         ScatterChart chart = createScatterChart(dataName);
@@ -476,6 +478,7 @@ public class ContentFragment extends Fragment {
         charts.add(chart);
     }
 
+    @Deprecated
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     private void genRiskScatterChart(String dataName) {
         ScatterChart chart = createScatterChart(dataName);
@@ -532,31 +535,28 @@ public class ContentFragment extends Fragment {
         LineData lineData = new LineData();
 
         LineDataSet lineDataSet = new LineDataSet(data, dataName);
+        lineDataSet.setDrawCircles(false);
         DataType d = DataType.valueOfName(dataName);
         if (getResources().getBoolean(R.bool.portrait_only)) {
             lineDataSet.setColor(requireContext().getColor(R.color.primary));
 
             float avg = 0;
-            for (Entry e: data
-                 ) {
-                avg+=e.getY();
+            for (Entry e : data
+            ) {
+                avg += e.getY();
             }
-            avg= avg/data.size();
-            float newestY = data.get(data.size()-1).getY();
-            if(newestY>=avg*1.3f ||newestY<=avg*0.7f || newestY<d.getHealthyRange()[0] ||newestY>d.getHealthyRange()[1]){ //20% higher than average
+            avg = avg / data.size();
+            float newestY = data.get(data.size() - 1).getY();
+            if (newestY >= avg * 1.3f || newestY <= avg * 0.7f || newestY < d.getHealthyRange()[0] || newestY > d
+                    .getHealthyRange()[1]) { //20% higher than average
                 lineDataSet.setColor(requireContext().getColor(R.color.error_dark));
-                Snackbar.make(requireContext(), requireView(),"Dangerous trend detected!",Snackbar.LENGTH_INDEFINITE).setAction(
-                        "Acknowledge", view -> {}).setBackgroundTint(
+                Snackbar.make(requireContext(), requireView(), "Dangerous trend detected!",
+                        Snackbar.LENGTH_INDEFINITE).setAction(
+                        "Acknowledge", view -> {
+                        }).setBackgroundTint(
                         requireContext().getColor(R.color.error_dark)).show();
 
             }
-
-
-
-
-
-
-
 
 
         } else {
@@ -569,7 +569,8 @@ public class ContentFragment extends Fragment {
         xAxis.setDrawLimitLinesBehindData(true);
 
 
-        LimitLine[] limitLines = getLimitLines(d,"lower Limit","upper Limit",requireContext().getColor(d.getColor()));
+        LimitLine[] limitLines = getLimitLines(d, "lower Limit", "upper Limit",
+                requireContext().getColor(d.getColor()));
         yAxis.addLimitLine(limitLines[0]);
         yAxis.addLimitLine(limitLines[1]);
 
@@ -598,9 +599,10 @@ public class ContentFragment extends Fragment {
 
     }
 
-    private LimitLine[] getLimitLines(DataType type, String lowerLabel, String upperLabel, int color){
+    private LimitLine[] getLimitLines(DataType type, String lowerLabel, String upperLabel,
+                                      int color) {
 
-        LimitLine upperLimit= new LimitLine(type.getHealthyRange()[1], upperLabel);
+        LimitLine upperLimit = new LimitLine(type.getHealthyRange()[1], upperLabel);
         upperLimit.setLineWidth(1f);
         upperLimit.enableDashedLine(40f, 20f, 0f);
         upperLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
@@ -613,7 +615,7 @@ public class ContentFragment extends Fragment {
         lowerLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
         lowerLimit.setLineColor(color);
 
-        return new LimitLine[]{lowerLimit,upperLimit};
+        return new LimitLine[]{lowerLimit, upperLimit};
     }
 
     private void genBloodPressureChart(String dataName) {
@@ -626,6 +628,7 @@ public class ContentFragment extends Fragment {
         DataType dDia = DataType.valueOfName(getString(R.string.m_bpdia));
         lineDataSetDia.setColor(requireContext().getColor(dDia.getColor()));
         lineDataSetDia.setHighlightEnabled(true);
+        lineDataSetDia.setDrawCircles(false);
         lineDataSetDia.setLineWidth(3.0f);
         lineDataSetDia.setDrawValues(false);
         lineDataSetDia.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -636,6 +639,7 @@ public class ContentFragment extends Fragment {
         DataType dSys = DataType.valueOfName(getString(R.string.m_bpsys));
         lineDataSetSys.setColor(requireContext().getColor(dSys.getColor()));
         lineDataSetSys.setHighlightEnabled(true);
+        lineDataSetDia.setDrawCircles(false);
         lineDataSetSys.setLineWidth(3.0f);
         lineDataSetSys.setDrawValues(false);
         lineDataSetSys.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -660,8 +664,6 @@ public class ContentFragment extends Fragment {
             }
 
 
-
-
         }
 
         XAxis xAxis = chart.getXAxis();
@@ -671,17 +673,17 @@ public class ContentFragment extends Fragment {
         xAxis.setDrawLimitLinesBehindData(true);
 
 
-        LimitLine[] limitLinesDia = getLimitLines(dDia,"Diastolic lower Limit","Diastolic upper Limit",requireContext().getColor(dDia.getColor()));
+        LimitLine[] limitLinesDia = getLimitLines(dDia, "Diastolic lower Limit",
+                "Diastolic upper Limit", requireContext().getColor(dDia.getColor()));
         limitLinesDia[1].setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
         yAxis.addLimitLine(limitLinesDia[0]);
         yAxis.addLimitLine(limitLinesDia[1]);
 
-        LimitLine[] limitLinesSys = getLimitLines(dSys,"Systolic lower Limit","Systolic upper Limit",requireContext().getColor(dSys.getColor()));
+        LimitLine[] limitLinesSys = getLimitLines(dSys, "Systolic lower Limit",
+                "Systolic upper Limit", requireContext().getColor(dSys.getColor()));
         limitLinesSys[0].setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
         yAxis.addLimitLine(limitLinesSys[0]);
         yAxis.addLimitLine(limitLinesSys[1]);
-
-
 
 
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
@@ -796,7 +798,9 @@ public class ContentFragment extends Fragment {
 
     private void showLast24H() {
         LocalDate now = LocalDate.now();
-        long yesterday = now.minusDays(1).atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000;
+        long yesterday = now.minusDays(1)
+                .atStartOfDay(ZoneId.systemDefault())
+                .toEpochSecond() * 1000;
 
         if (!charts.isEmpty()) {
             showWholeData();
@@ -809,26 +813,32 @@ public class ContentFragment extends Fragment {
 
     private void showLastWeek() {
         LocalDate now = LocalDate.now();
-        long lastWeek = now.minusWeeks(1).atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000;
+        long lastWeek = now.minusWeeks(1)
+                .atStartOfDay(ZoneId.systemDefault())
+                .toEpochSecond() * 1000;
 
         if (!charts.isEmpty()) {
             showWholeData();
             LineChart chart = (LineChart) charts.get(0);
             float scaleFactor = (System.currentTimeMillis() - firstDataEntry) / (1000.0f * 60.0f * 60.0f * 24.0f);
-            chart.zoom(scaleFactor / 7.0f, 1.0f, (System.currentTimeMillis() - lastWeek) / 2.0f, 0.0f);
+            chart.zoom(scaleFactor / 7.0f, 1.0f, (System.currentTimeMillis() - lastWeek) / 2.0f,
+                    0.0f);
             SyncChartsListener.syncCharts(chart, getOtherCharts(chart));
         }
     }
 
     private void showLastMonth() {
         LocalDate now = LocalDate.now();
-        long lastMonth = now.minusMonths(1).atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000;
+        long lastMonth = now.minusMonths(1)
+                .atStartOfDay(ZoneId.systemDefault())
+                .toEpochSecond() * 1000;
         if (!charts.isEmpty()) {
 
             showWholeData();
             LineChart chart = (LineChart) charts.get(0);
             float scaleFactor = (System.currentTimeMillis() - firstDataEntry) / (1000.0f * 60.0f * 60.0f * 24.0f);
-            chart.zoom(scaleFactor / 30.0f, 1.0f, (System.currentTimeMillis() - lastMonth) / 2.0f, 0.0f);
+            chart.zoom(scaleFactor / 30.0f, 1.0f, (System.currentTimeMillis() - lastMonth) / 2.0f,
+                    0.0f);
             SyncChartsListener.syncCharts(chart, getOtherCharts(chart));
         }
     }
@@ -864,40 +874,41 @@ public class ContentFragment extends Fragment {
 
         firstDataEntry = Converters.dateToTimestamp(
                 Collections.min(patientWithData.patientDataRecords,
-                (entry, t1) -> { //entry < t1 == -1 / entry = t1 == 0
-                    if (entry.timeStamp.isBefore(t1.timeStamp)) {
+                        (entry, t1) -> { //entry < t1 == -1 / entry = t1 == 0
+                            if (entry.timeStamp.isBefore(t1.timeStamp)) {
 
-                        return -1;
-                    } else if (entry.timeStamp.isAfter(t1.timeStamp)) {
-                        return 1;
-                    }
-                    return 0;
-                }).timeStamp);
+                                return -1;
+                            } else if (entry.timeStamp.isAfter(t1.timeStamp)) {
+                                return 1;
+                            }
+                            return 0;
+                        }).timeStamp);
 
-        if(getResources().getBoolean(R.bool.portrait_only)) {
+        if (getResources().getBoolean(R.bool.portrait_only)) {
             Objects.requireNonNull(chipMap.get(getString(R.string.m_bloodsugar))).setChecked(true);
         }
 
         for (Map.Entry<String, Chip> stringChipEntry : chipMap.entrySet()) {
-           String dataName;
-            if(stringChipEntry.getKey().equals(getString(R.string.bloodpressure))){
+            String dataName;
+            if (stringChipEntry.getKey().equals(getString(R.string.bloodpressure))) {
                 dataName = getString(R.string.m_bpdia);
-            }else {
-               dataName = stringChipEntry.getKey();
+            } else {
+                dataName = stringChipEntry.getKey();
             }
             List<Entry> data = getNumericData(dataName);
             float avg = 0;
             Entry result = data.get(0);
 
-            for (int i=0;i<data.size();i++){
-                avg+=data.get(i).getY();
-                if(result.getX()<data.get(i).getX()){
+            for (int i = 0; i < data.size(); i++) {
+                avg += data.get(i).getY();
+                if (result.getX() < data.get(i).getX()) {
                     result = data.get(i);
                 }
             }
-            avg = avg/data.size();
+            avg = avg / data.size();
             float[] healthyRange = DataType.valueOfName(dataName).getHealthyRange();
-            if(result.getY()<avg*0.7f || result.getY()>avg*1.3f || result.getY()<healthyRange[0] ||result.getY()>healthyRange[1]){
+            if (result.getY() < avg * 0.7f || result.getY() > avg * 1.3f || result.getY() < healthyRange[0] || result
+                    .getY() > healthyRange[1]) {
                 stringChipEntry.getValue().setChipIconVisible(true);
             }
         }
@@ -911,18 +922,17 @@ public class ContentFragment extends Fragment {
         this.patientWithData = data;
     }
 
-
-    private interface OnDataLoadedCallback {
-        void onDataLoaded(PatientWithData data);
+    private void showAddDataDialog(String dataName) {
+        AddDataBottomSheet sheet = new AddDataBottomSheet(dataName, patient.id,
+                () -> {
+                });
+        sheet.show(getParentFragmentManager(), "addDataBottomSheet");
+        Log.d("FRAGMENT CONTENT", "SHOW ADD DATA DIALOG");
     }
 
 
-
-    private void showAddDataDialog(String dataName){
-        AddDataBottomSheet sheet = new AddDataBottomSheet(dataName, patient.id,
-               ()->{});
-        sheet.show(getParentFragmentManager(), "addDataBottomSheet");
-        Log.d("FRAGMENT CONTENT","SHOW ADD DATA DIALOG");
+    private interface OnDataLoadedCallback {
+        void onDataLoaded(PatientWithData data);
     }
 
 
